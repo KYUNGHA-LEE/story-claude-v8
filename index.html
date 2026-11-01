@@ -323,38 +323,16 @@
   .mbtns button:disabled{opacity:.35;cursor:not-allowed;}
   .mcard audio{width:100%;height:36px;}
 
-  /* 7단계: 오디오 플립북 */
-  .bookstage{
-    background:#3A332B;border-radius:12px;padding:22px 12px;display:flex;flex-direction:column;align-items:center;gap:14px;
+  /* 7단계: 책 모양 고르기 (책 화면 자체의 스타일은 스크립트의 VIEWER_CSS — 받은 파일과 같이 씀) */
+  .layoutbar{
+    display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;
+    border:1px solid var(--line);border-radius:10px;background:#FFFDF8;padding:10px 14px;margin-bottom:12px;font-size:0.88rem;
   }
-  .bookstage:fullscreen{border-radius:0;justify-content:center;padding:20px;}
-  #bookHost{margin:0 auto;}
-  .bpage{background:#FFFDF8;overflow:hidden;}
-  .bpage .fill{position:absolute;inset:0;}
-  .bpage img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;pointer-events:none;}
-  .bpage.noimg .fill{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1em;background:#F1EBDD;}
-  .bpage.text .fill{
-    display:flex;flex-direction:column;justify-content:center;
-    padding:12% 11%;background:#FFFDF8;color:var(--ink);
-    font-size:var(--bfont,18px);line-height:1.9;font-weight:500;word-break:keep-all;
-  }
-  .bpage.text .pno{position:absolute;bottom:5%;left:0;right:0;text-align:center;font-size:0.7em;color:var(--muted);}
-  .bpage.cover .fill,.bpage.back .fill{
-    background:var(--teal);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    text-align:center;padding:12%;gap:0.8em;
-  }
-  .bpage.cover h3{font-size:calc(var(--bfont,18px) * 1.7);font-weight:900;line-height:1.35;word-break:keep-all;}
-  .bpage.cover p,.bpage.back p{font-size:calc(var(--bfont,18px) * 0.8);opacity:.85;}
-  .bpage.back h3{font-size:calc(var(--bfont,18px) * 1.6);font-weight:900;}
-  .bookctl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;}
-  .bookctl button{
-    border:1px solid #CFC5B0;border-radius:9px;background:#FBF6EC;color:var(--ink);
-    font-family:inherit;font-size:0.9rem;font-weight:700;padding:9px 14px;cursor:pointer;
-  }
-  .bookctl button:hover{background:#fff;}
-  .bookctl button.play{background:var(--orange);border-color:var(--orange);color:#fff;min-width:118px;}
-  .bookctl label{color:#F3EBDD;font-size:0.85rem;display:flex;align-items:center;gap:5px;cursor:pointer;}
-  .bookinfo{color:#F3EBDD;font-size:0.85rem;min-height:1.4em;text-align:center;}
+  .layoutbar .lbl{font-weight:900;color:var(--teal-dark);}
+  .layoutbar label{display:flex;align-items:center;gap:5px;cursor:pointer;}
+  .tiibox{flex-direction:column;align-items:flex-start;gap:6px;}
+  .tiibox.unset{border:2px solid var(--orange);background:var(--orange-soft);}
+  .tiinote{font-size:0.78rem;color:var(--orange-dark);}
   .exportbox{
     margin-top:14px;border:2px solid var(--orange);border-radius:12px;background:var(--orange-soft);
     padding:14px 16px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;
@@ -364,8 +342,6 @@
   .exportbox .done{font-size:0.82rem;color:var(--teal-dark);font-weight:700;margin-top:6px;}
   @media(max-width:640px){
     #panel7{padding:16px 10px;}
-    .bookstage{padding:14px 6px;}
-    .bookctl button{padding:8px 10px;font-size:0.85rem;}
   }
 </style>
 </head>
@@ -557,6 +533,12 @@
       4단계 프롬프트로 이미지 생성 AI(ChatGPT 등)에서 만든 그림을 쪽마다 올립니다. 쪽 수와 원고는 1·3단계 내용을 그대로 씁니다.
       그림 비율이 2단계 책 크기와 다르면 책 크기에 맞게 잘라서 보여 주며, 자를 위치는 카드의 막대로 옮길 수 있습니다. (원본 파일은 바뀌지 않습니다)
     </p>
+    <div class="layoutbar tiibox" data-tii="5">
+      <span class="lbl">먼저 알려 주세요. 그림에 원고(글)가 이미 들어 있나요?</span>
+      <label><input type="radio" name="tii5" value="no"> 아니요, 그림만 있어요 → 플립북에서 원고를 그림 옆 쪽에 넣어 드려요</label>
+      <label><input type="radio" name="tii5" value="yes"> 네, 캔바 등에서 원고를 넣었어요 → 원고를 따로 넣지 않고, 글자가 잘리지 않게 그림 전체를 보여 드려요</label>
+      <span class="tiinote" id="tiiNote5"></span>
+    </div>
     <div class="dropzone" id="drop5">
       그림 파일을 여기에 한꺼번에 끌어다 놓거나 아래 버튼으로 고르세요.<br>
       파일 이름에 쪽 번호(1, 2, 3…)가 있으면 그 번호의 쪽에, 없으면 파일을 받은(저장한) 시각 순서대로 1쪽부터 넣습니다.
@@ -605,22 +587,17 @@
   <section class="panel" id="panel7" hidden>
     <h2>7단계. 오디오 플립북</h2>
     <p class="desc">
-      왼쪽에 그림, 오른쪽에 원고가 펼쳐지고, 책장을 넘기면 그 쪽의 음성이 나옵니다. 화면이 좁으면 한 쪽씩 보여 줍니다.
+      올린 그림·원고·음성으로 플립북을 만들고, 책장을 넘기면 그 쪽의 음성이 나옵니다.
+      그림에 원고가 없으면 <b>왼쪽에 그림, 오른쪽에 원고</b>가 펼쳐지고, 원고가 이미 그림에 들어 있으면(캔바 등에서 넣은 경우) <b>원고를 따로 넣지 않고 그림만</b> 보여 줍니다.
+      그림만 보여 줄 때는 넓은 화면에서 두 쪽이 함께 펼쳐지고 왼쪽 → 오른쪽 순서로 읽어 줍니다. 화면이 좁으면 한 쪽씩 보여 줍니다.
       책장 모서리를 끌거나 누르고, 아래 버튼이나 키보드 ← → 로도 넘길 수 있습니다.
     </p>
-    <div class="bookstage" id="bookStage">
-      <div id="bookHost"></div>
-      <div class="bookinfo" id="bookInfo"></div>
-      <div class="bookctl">
-        <button type="button" id="bkFirst" title="표지로 돌아가기">⏮ 처음으로</button>
-        <button type="button" id="bkPrev">◀ 이전</button>
-        <button type="button" class="play" id="bkPlay">▶ 소리 듣기</button>
-        <button type="button" id="bkReplay" title="지금 쪽의 음성을 처음부터 다시 듣기">↺ 다시 듣기</button>
-        <button type="button" id="bkNext">다음 ▶</button>
-        <label><input type="checkbox" id="bkAuto"> 자동 넘김</label>
-        <button type="button" id="bkFull">전체 화면</button>
-      </div>
+    <div class="layoutbar tiibox" data-tii="7">
+      <span class="lbl">그림에 원고(글)가 들어 있나요?</span>
+      <label><input type="radio" name="tii7" value="no"> 아니요 → 왼쪽 그림 · 오른쪽 원고</label>
+      <label><input type="radio" name="tii7" value="yes"> 네 → 원고 없이 그림만</label>
     </div>
+    <div id="bookRoot"></div>
     <div class="exportbox">
       <div>
         <b>완성된 플립북을 파일 하나로 받기</b>
@@ -1574,12 +1551,7 @@ document.getElementById("floatNext").addEventListener("click", function(){
 document.addEventListener("keydown", function(e){
   var tag = (e.target && e.target.tagName || "").toLowerCase();
   if(tag === "input" || tag === "textarea" || e.altKey || e.ctrlKey || e.metaKey) return;
-  if(state.step === 7 && pf){   /* 7단계에서는 화살표로 책장을 넘긴다 */
-    if(e.key === "ArrowLeft"){ e.preventDefault(); unlockAudio(); pf.flipPrev(); }
-    if(e.key === "ArrowRight"){ e.preventDefault(); unlockAudio(); pf.flipNext(); }
-    if(e.key === " " && tag !== "button"){ e.preventDefault(); document.getElementById("bkPlay").click(); }
-    return;
-  }
+  if(state.step === 7) return;   /* 7단계에서는 플립북(flipbookViewer)이 화살표·스페이스를 쓴다 */
   if(e.key === "ArrowLeft" && state.step > 1) showStep(state.step - 1);
   if(e.key === "ArrowRight" && state.step < LAST_STEP) showStep(state.step + 1);
 });
@@ -1861,6 +1833,7 @@ function renderGrid5(){
       var im = document.createElement("img");
       im.src = rec.url; im.alt = p.n + "쪽 그림";
       im.style.objectPosition = rec.fx + "% " + rec.fy + "%";
+      if(textInImage()){ im.style.objectFit = "contain"; im.style.background = "#FFFDF8"; }   /* 원고가 들어 있으면 자르지 않음 */
       thumb.appendChild(im);
     } else {
       var em = document.createElement("div"); em.className = "empty";
@@ -1868,7 +1841,7 @@ function renderGrid5(){
       thumb.appendChild(em);
     }
     card.appendChild(thumb);
-    if(rec && rec.w && rec.h && Math.abs(rec.h / rec.w - ratio) > 0.01){
+    if(rec && rec.w && rec.h && !textInImage() && Math.abs(rec.h / rec.w - ratio) > 0.01){
       var wide = (rec.h / rec.w) < ratio;   /* 책보다 가로로 긴 그림 → 좌우 위치 */
       var crop = document.createElement("label"); crop.className = "mcrop";
       crop.appendChild(document.createTextNode(wide ? "좌우 위치" : "위아래 위치"));
@@ -1934,247 +1907,61 @@ acceptDropOn(document.getElementById("drop6"), function(files){ addMany("aud", f
 window.addEventListener("dragover", function(e){ if(state.step === 5 || state.step === 6) e.preventDefault(); });
 window.addEventListener("drop", function(e){ if(state.step === 5 || state.step === 6) e.preventDefault(); });
 
-/* ---------- 7단계: 오디오 플립북 ---------- */
-var pf = null;                  /* St.PageFlip */
-var bookPages = [];
-var bookStory = -1;             /* 지금 펼친 쪽: 0 = 표지, 1~N = 본문, N+1 = 뒤표지 */
-var bookPlayer = new Audio();
-var playerK = 0;                /* bookPlayer에 들어 있는 쪽 (-1 = 소리 잠금 해제용) */
-var bookTimers = [];
-var audioUnlocked = false;
-var PRE_PLAY_MS = 450;          /* 책장이 다 넘어간 뒤 읽기 시작까지 */
-var AUTO_NEXT_MS = 1500;        /* 자동 넘김: 다 읽고 다음 쪽으로 가기까지 */
-
-function clearBookTimers(){ bookTimers.forEach(clearTimeout); bookTimers = []; }
-function stopBookAudio(){
-  clearBookTimers();
-  try{ bookPlayer.pause(); }catch(e){}
-  updatePlayBtn();
+/* ---------- 7단계: 오디오 플립북 ----------
+   책 화면은 아래 flipbookViewer 하나로 만든다. 앱 7단계와 '플립북 파일로 받기'로 받은 파일이 같은 코드를 쓴다. */
+var viewer = null;              /* flipbookViewer가 돌려준 { stop, refresh, destroy } */
+/* 그림에 원고가 이미 들어 있나? (5·7단계에서 물어봄)
+   네 → 원고를 따로 넣지 않고 그림만, 글자가 잘리지 않게 전체를 보여 줌 / 아니요·아직 → 왼쪽 그림·오른쪽 원고 */
+function textInImage(){ return state.textInImage === true; }
+function bookLayout(){ return textInImage() ? "pictures" : "spread"; }
+function bookData(){
+  return {
+    title: document.getElementById("s1concept").value.trim() || "나의 동화책",
+    ratio: bookRatio(), made: new Date().toISOString().slice(0, 10),
+    layout: bookLayout(),
+    pages: storyPages().map(function(p){
+      var ir = media.img[p.n], ar = media.aud[p.n];
+      return { n: p.n, text: p.text, img: ir ? ir.url : null, fx: ir ? ir.fx : 50, fy: ir ? ir.fy : 50, aud: ar ? ar.url : null };
+    })
+  };
 }
-function storyOfIndex(idx){   /* 책장 번호 → 쪽: 0 표지, (1,2)=1쪽, (3,4)=2쪽 … */
-  if(idx <= 0) return 0;
-  var k = Math.ceil(idx / 2);
-  return k > bookPages.length ? bookPages.length + 1 : k;
-}
-function makeBookPage(cls, hard){
-  var d = document.createElement("div");
-  d.className = "bpage " + cls;
-  if(hard) d.setAttribute("data-density", "hard");
-  var f = document.createElement("div"); f.className = "fill";
-  d.appendChild(f);
-  return d;
-}
-function sizeBookHost(ratio){
-  var host = document.getElementById("bookHost");
-  var stage = document.getElementById("bookStage");
-  var full = document.fullscreenElement === stage;
-  var availW = stage.clientWidth - (window.innerWidth <= 640 ? 12 : 24);
-  var availH = full ? window.innerHeight - 150 : Math.max(260, window.innerHeight * 0.68);
-  var w = Math.min(availW, availH / ratio * 2);
-  host.style.width = Math.max(200, Math.floor(w)) + "px";
-}
-function fitBookFont(){
-  var host = document.getElementById("bookHost");
-  if(!pf) return;
-  var portrait = pf.getOrientation() === "portrait";
-  var pageW = host.clientWidth / (portrait ? 1 : 2);
-  var px = Math.max(12, Math.min(34, pageW * 0.052));
-  host.style.setProperty("--bfont", px.toFixed(1) + "px");
-}
-function destroyBook(){
-  stopBookAudio();
-  if(pf){ try{ pf.destroy(); }catch(e){} pf = null; }
-  document.getElementById("bookHost").innerHTML = "";
-}
+function stopBookAudio(){ if(viewer) viewer.stop(); }
 function ensureBook(){
-  if(bookDirty || !pf){ buildBook(0); }
-  else { updateBookInfo(); }
-}
-function buildBook(startIndex){
   clearError(7);
-  destroyBook();
-  bookDirty = false;
-  var host = document.getElementById("bookHost");
   if(typeof St === "undefined" || !St.PageFlip){
     showError(7, "책장 넘김 기능(page-flip)을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침해 주세요.");
     return;
   }
-  bookPages = storyPages();
-  if(!bookPages.length){
+  if(!storyPages().length){
+    if(viewer){ viewer.destroy(); viewer = null; }
     showError(7, "쪽이 없습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 3단계 원고를 먼저 만들어 주세요.");
-    document.getElementById("bookInfo").textContent = "";
     return;
   }
-  var ratio = bookRatio();
-  sizeBookHost(ratio);
-  var book = document.createElement("div");
-  host.appendChild(book);
-
-  var cover = makeBookPage("cover", true);
-  var h3 = document.createElement("h3"); h3.textContent = document.getElementById("s1concept").value.trim() || "나의 동화책";
-  var sub = document.createElement("p"); sub.textContent = "책장을 넘기거나 [▶ 소리 듣기]를 누르세요";
-  cover.firstChild.appendChild(h3); cover.firstChild.appendChild(sub);
-  book.appendChild(cover);
-
-  bookPages.forEach(function(p){
-    var rec = media.img[p.n];
-    var pi = makeBookPage(rec ? "image" : "image noimg");
-    if(rec){
-      var im = document.createElement("img");
-      im.src = rec.url; im.alt = p.n + "쪽 그림"; im.draggable = false;
-      im.style.objectPosition = rec.fx + "% " + rec.fy + "%";
-      pi.firstChild.appendChild(im);
-    } else {
-      pi.firstChild.textContent = p.n + "쪽 그림 없음 (5단계에서 올리기)";
-    }
-    book.appendChild(pi);
-    var pt = makeBookPage("text");
-    var tx = document.createElement("div"); tx.textContent = p.text || "";
-    var no = document.createElement("div"); no.className = "pno"; no.textContent = p.n;
-    pt.firstChild.appendChild(tx); pt.firstChild.appendChild(no);
-    book.appendChild(pt);
-  });
-
-  var back = makeBookPage("back", true);
-  var end = document.createElement("h3"); end.textContent = "끝";
-  var again = document.createElement("p"); again.textContent = "[⏮ 처음으로]를 누르면 다시 볼 수 있어요";
-  back.firstChild.appendChild(end); back.firstChild.appendChild(again);
-  book.appendChild(back);
-
-  var w = 500, h = Math.round(500 * ratio);
-  pf = new St.PageFlip(book, {
-    width: w, height: h, size: "stretch",
-    minWidth: 220, maxWidth: 1400, minHeight: Math.round(220 * ratio), maxHeight: Math.round(1400 * ratio),
-    showCover: true, usePortrait: true, drawShadow: true, maxShadowOpacity: 0.5,
-    flippingTime: 800, mobileScrollSupport: false
-  });
-  pf.loadFromHTML(book.querySelectorAll(".bpage"));
-  var quietUntil = Date.now() + 400;   /* 다시 만들 때 쪽 위치를 되돌리는 것은 '넘김'으로 보지 않음 (소리 안 냄) */
-  pf.on("flip", function(e){ onBookFlip(e.data, Date.now() < quietUntil); });
-  pf.on("changeOrientation", function(){ fitBookFont(); });
-  fitBookFont();
-  bookStory = -1;
-  if(startIndex > 0){ try{ pf.turnToPage(startIndex); }catch(e){} }
-  onBookFlip(pf.getCurrentPageIndex(), true);
-}
-function onBookFlip(idx, quiet){
-  var k = storyOfIndex(idx);
-  if(k !== bookStory){
-    bookStory = k;
-    stopBookAudio();
-    if(!quiet && k >= 1 && k <= bookPages.length){
-      bookTimers.push(setTimeout(function(){ playStory(k, true); }, PRE_PLAY_MS));
-    }
-  }
-  updateBookInfo();
-}
-function playStory(k, fromStart){
-  clearBookTimers();
-  var rec = media.aud[k];
-  if(!rec){
-    updateBookInfo();
-    if(document.getElementById("bkAuto").checked) bookTimers.push(setTimeout(goNextStory, 3000));
-    return;
-  }
-  bookPlayer.muted = false;
-  if(playerK !== k){ bookPlayer.src = rec.url; playerK = k; }
-  if(fromStart){ try{ bookPlayer.currentTime = 0; }catch(e){} }
-  var pr = bookPlayer.play();
-  if(pr && pr.catch){
-    pr.catch(function(){
-      updatePlayBtn();
-      document.getElementById("bookInfo").textContent = "브라우저가 소리를 막았습니다. [▶ 소리 듣기]를 눌러 주세요.";
+  if(bookDirty || !viewer){
+    if(viewer) viewer.destroy();
+    viewer = flipbookViewer(bookData(), document.getElementById("bookRoot"), {
+      active: function(){ return state.step === 7; },
+      missingHint: " (6단계에서 올리기)"
     });
+    bookDirty = false;
+  } else {
+    viewer.refresh();   /* 다른 단계에 있는 동안 창 크기가 바뀌었을 수 있음 */
   }
-  updatePlayBtn();
 }
-function goNextStory(){
-  if(!pf || bookStory > bookPages.length) return;
-  var target = bookStory < bookPages.length ? 2 * (bookStory + 1) - 1 : 2 * bookPages.length + 1;
-  pf.flip(target);
+function syncTii(){
+  var v = state.textInImage === true ? "yes" : (state.textInImage === false ? "no" : "");
+  document.querySelectorAll('input[name="tii5"], input[name="tii7"]').forEach(function(r){ r.checked = (r.value === v); });
+  document.querySelectorAll(".tiibox").forEach(function(b){ b.classList.toggle("unset", !v); });
+  document.getElementById("tiiNote5").textContent = v ? "" : "아직 고르지 않았어요. 고르지 않으면 '아니요'(그림 옆 쪽에 원고)로 만듭니다.";
 }
-function isPlaying(){ return playerK > 0 && !bookPlayer.paused && !bookPlayer.ended; }
-function updatePlayBtn(){
-  var b = document.getElementById("bkPlay");
-  if(b) b.textContent = isPlaying() ? "⏸ 멈춤" : "▶ 소리 듣기";
-}
-function updateBookInfo(){
-  var el = document.getElementById("bookInfo");
-  var n = bookPages.length, k = bookStory;
-  if(!pf || !n){ el.textContent = ""; return; }
-  var auto = document.getElementById("bkAuto").checked ? " · 자동 넘김 켜짐" : "";
-  if(k <= 0) el.textContent = "표지 · [다음 ▶]이나 [▶ 소리 듣기]를 누르면 1쪽부터 읽어 줍니다." + auto;
-  else if(k > n) el.textContent = "끝 · [⏮ 처음으로]를 누르면 다시 볼 수 있어요.";
-  else el.textContent = k + "쪽 / " + n + "쪽" + (media.aud[k] ? "" : " · 이 쪽은 음성이 없습니다 (6단계에서 올리기)") + auto;
-  document.getElementById("bkNext").disabled = k > n;
-  document.getElementById("bkPrev").disabled = k <= 0;
-}
-/* 아이폰 등은 첫 재생이 버튼을 누른 순간에 일어나야 하므로, 처음 누를 때 소리 없이 한 번 재생해 둔다 */
-function unlockAudio(){
-  if(audioUnlocked) return;
-  audioUnlocked = true;
-  var keys = Object.keys(media.aud);
-  if(!keys.length || playerK > 0) return;
-  bookPlayer.muted = true;
-  bookPlayer.src = media.aud[keys[0]].url;
-  playerK = -1;
-  var pr = bookPlayer.play();
-  var done = function(){ if(playerK === -1){ bookPlayer.pause(); playerK = 0; } bookPlayer.muted = false; };
-  if(pr && pr.then) pr.then(done, function(){ bookPlayer.muted = false; playerK = 0; audioUnlocked = false; });
-  else done();
-}
-bookPlayer.addEventListener("play", updatePlayBtn);
-bookPlayer.addEventListener("pause", updatePlayBtn);
-bookPlayer.addEventListener("ended", function(){
-  updatePlayBtn();
-  if(playerK > 0 && document.getElementById("bkAuto").checked) bookTimers.push(setTimeout(goNextStory, AUTO_NEXT_MS));
-});
-document.getElementById("bookStage").addEventListener("pointerdown", unlockAudio, true);
-document.getElementById("bkPlay").addEventListener("click", function(){
-  if(!pf) return;
-  unlockAudio();
-  var k = bookStory, n = bookPages.length;
-  if(k <= 0){ pf.flipNext(); return; }                 /* 표지 → 1쪽을 펼치면 읽기 시작 */
-  if(k > n) return;
-  if(isPlaying()){ bookPlayer.pause(); clearBookTimers(); return; }
-  var resume = playerK === k && bookPlayer.currentTime > 0 && !bookPlayer.ended;
-  playStory(k, !resume);
-});
-document.getElementById("bkReplay").addEventListener("click", function(){
-  unlockAudio();
-  if(bookStory >= 1 && bookStory <= bookPages.length) playStory(bookStory, true);
-});
-document.getElementById("bkPrev").addEventListener("click", function(){ if(pf){ unlockAudio(); pf.flipPrev(); } });
-document.getElementById("bkNext").addEventListener("click", function(){ if(pf){ unlockAudio(); pf.flipNext(); } });
-document.getElementById("bkFirst").addEventListener("click", function(){
-  if(!pf) return;
-  stopBookAudio();
-  pf.turnToPage(0);
-  onBookFlip(0, true);
-});
-document.getElementById("bkAuto").addEventListener("change", function(){
-  updateBookInfo();
-  if(this.checked && !isPlaying() && bookStory >= 1 && bookStory <= bookPages.length && playerK === bookStory && bookPlayer.ended){
-    bookTimers.push(setTimeout(goNextStory, AUTO_NEXT_MS));
-  }
-});
-document.getElementById("bkFull").addEventListener("click", function(){
-  var stage = document.getElementById("bookStage");
-  if(document.fullscreenElement){ document.exitFullscreen(); }
-  else if(stage.requestFullscreen){ stage.requestFullscreen().catch(function(){}); }
-});
-var resizeT = null;
-function rebuildKeepingPage(){
-  if(state.step !== 7 || !pf) return;
-  var idx = pf.getCurrentPageIndex();
-  var wasPlaying = isPlaying();
-  buildBook(idx);
-  if(wasPlaying && bookStory === playerK) playStory(bookStory, false);   /* 읽던 곳부터 이어서 */
-}
-window.addEventListener("resize", function(){ clearTimeout(resizeT); resizeT = setTimeout(rebuildKeepingPage, 250); });
-document.addEventListener("fullscreenchange", function(){
-  document.getElementById("bkFull").textContent = document.fullscreenElement ? "전체 화면 끝내기" : "전체 화면";
-  clearTimeout(resizeT); resizeT = setTimeout(rebuildKeepingPage, 150);
+document.querySelectorAll('input[name="tii5"], input[name="tii7"]').forEach(function(r){
+  r.addEventListener("change", function(){
+    state.textInImage = (r.value === "yes");
+    saveState(); syncTii();
+    bookDirty = true;
+    if(state.step === 5) renderGrid5();
+    if(state.step === 7) ensureBook();
+  });
 });
 
 /* ---------- 7단계: 플립북 HTML 파일 하나로 받기 ----------
@@ -2184,23 +1971,56 @@ var PAGEFLIP_URL = "https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-fl
 var EXPORT_MAX_SIDE = 1600;      /* 받는 그림의 긴 변 최대 픽셀 */
 var EXPORT_JPEG_Q = 0.86;
 
-function flipbookViewer(BOOK){
-  var $ = function(id){ return document.getElementById(id); };
-  document.body.innerHTML =
-    '<div class="stage" id="stage"><div id="host"></div><div class="info" id="info"></div>' +
-    '<div class="ctl"><button type="button" id="bFirst">⏮ 처음으로</button><button type="button" id="bPrev">◀ 이전</button>' +
-    '<button type="button" class="play" id="bPlay">▶ 소리 듣기</button><button type="button" id="bReplay">↺ 다시 듣기</button>' +
-    '<button type="button" id="bNext">다음 ▶</button><label><input type="checkbox" id="bAuto"> 자동 넘김</label>' +
-    '<button type="button" id="bFull">전체 화면</button></div><p class="foot" id="foot"></p></div>';
-  $("foot").textContent = BOOK.title + " · 오디오 플립북 (" + BOOK.made + ")";
+/* 오디오 플립북 화면 하나를 만든다.
+   BOOK = { title, ratio(세로÷가로), made,
+            layout: "spread"(왼쪽 그림·오른쪽 원고) | "pictures"(원고가 이미 그림에 들어 있음 → 그림만, 자르지 않고 전체),
+            pages: [{ n, text, img, fx, fy, aud }] }
+   root가 없으면 문서 전체(받은 파일), opts.active()가 false면 키보드·창 크기 변화에 반응하지 않음.
+   받은 파일 안에서 toString()으로 옮겨져 실행되므로 이 함수 밖의 앱 변수·함수를 쓰면 안 된다. */
+function flipbookViewer(BOOK, root, opts){
+  opts = opts || {};
+  var standalone = !root;
+  root = root || document.body;
+  var active = opts.active || function(){ return true; };
+  var missingHint = opts.missingHint || "";
+  var picOnly = BOOK.layout === "pictures";
+  root.innerHTML =
+    '<div class="fb-stage"><div class="fb-host"></div><div class="fb-info"></div><div class="fb-ctl">' +
+    '<button type="button" data-a="first" title="표지로 돌아가기">⏮ 처음으로</button>' +
+    '<button type="button" data-a="prev">◀ 이전</button>' +
+    '<button type="button" class="play" data-a="play">▶ 소리 듣기</button>' +
+    '<button type="button" data-a="replay" title="지금 펼친 쪽의 음성을 처음부터 다시 듣기">↺ 다시 듣기</button>' +
+    '<button type="button" data-a="next">다음 ▶</button>' +
+    '<label><input type="checkbox" data-a="auto"> 자동 넘김</label>' +
+    '<button type="button" data-a="full">전체 화면</button></div>' +
+    (standalone ? '<p class="fb-foot"></p>' : '') + '</div>';
+  var stage = root.querySelector(".fb-stage");
+  var host = stage.querySelector(".fb-host");
+  var infoEl = stage.querySelector(".fb-info");
+  function q(a){ return stage.querySelector('[data-a="' + a + '"]'); }
+  if(standalone) stage.querySelector(".fb-foot").textContent = BOOK.title + " · 오디오 플립북 (" + BOOK.made + ")";
+
   var pages = BOOK.pages, n = pages.length, ratio = BOOK.ratio || 1;
-  var pf = null, story = -1, player = new Audio(), playerK = 0, timers = [], unlocked = false;
-  var PRE = 450, AUTO = 1500;
+  var pf = null, unit = null, curIdx = 0, alive = true, unlocked = false;
+  var player = new Audio(), playerK = 0, queue = [], qi = 0, timers = [];
+  var PRE = 450, GAP = 500, AUTO = 1500;   /* 넘긴 뒤 읽기까지 · 왼쪽→오른쪽 쪽 사이 · 자동 넘김까지 (ms) */
+
   function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
   function isPlaying(){ return playerK > 0 && !player.paused && !player.ended; }
-  function updBtn(){ $("bPlay").textContent = isPlaying() ? "⏸ 멈춤" : "▶ 소리 듣기"; }
+  function updBtn(){ q("play").textContent = isPlaying() ? "⏸ 멈춤" : "▶ 소리 듣기"; }
   function stop(){ clearTimers(); try{ player.pause(); }catch(e){} updBtn(); }
-  function storyOf(idx){ if(idx <= 0) return 0; var k = Math.ceil(idx / 2); return k > n ? n + 1 : k; }
+  function portrait(){ return !!pf && pf.getOrientation() === "portrait"; }
+  /* 책장 번호 → 지금 펼쳐진 이야기 쪽들
+     펼침면: 0 표지, (1,2) = 1쪽 그림·글, (3,4) = 2쪽 …
+     그림만: 0 표지, 1~N이 이야기 쪽. 넓은 화면은 (1,2)(3,4)… 두 쪽씩, 좁은 화면은 한 쪽씩 */
+  function unitOf(idx){
+    if(idx <= 0) return { key: "cover", list: [] };
+    var list;
+    if(!picOnly){ var k = Math.ceil(idx / 2); list = k <= n ? [k] : []; }
+    else if(portrait()){ list = idx <= n ? [idx] : []; }
+    else { var left = idx % 2 ? idx : idx - 1; list = [left, left + 1].filter(function(k){ return k >= 1 && k <= n; }); }
+    return list.length ? { key: list.join("-"), list: list } : { key: "end", list: [], end: true };
+  }
   function mk(cls, hard){
     var d = document.createElement("div"); d.className = "bpage " + cls;
     if(hard) d.setAttribute("data-density", "hard");
@@ -2208,51 +2028,69 @@ function flipbookViewer(BOOK){
     return d;
   }
   function sizeHost(){
-    var stage = $("stage"), host = $("host");
+    var full = document.fullscreenElement === stage;
     var availW = stage.clientWidth - (window.innerWidth <= 640 ? 12 : 24);
-    var availH = Math.max(260, window.innerHeight - 160);
-    host.style.width = Math.max(200, Math.floor(Math.min(availW, availH / ratio * 2))) + "px";
+    var availH = full ? window.innerHeight - 150 : (standalone ? window.innerHeight - 160 : window.innerHeight * 0.68);
+    var w = Math.min(availW, Math.max(260, availH) / ratio * 2);
+    host.style.width = Math.max(200, Math.floor(w)) + "px";
   }
   function fitFont(){
     if(!pf) return;
-    var host = $("host");
-    var pw = host.clientWidth / (pf.getOrientation() === "portrait" ? 1 : 2);
+    var pw = host.clientWidth / (portrait() ? 1 : 2);
     host.style.setProperty("--bfont", Math.max(12, Math.min(34, pw * 0.052)).toFixed(1) + "px");
   }
   function info(){
-    var el = $("info"), k = story, auto = $("bAuto").checked ? " · 자동 넘김 켜짐" : "";
-    if(k <= 0) el.textContent = "표지 · [다음 ▶]이나 [▶ 소리 듣기]를 누르면 1쪽부터 읽어 줍니다." + auto;
-    else if(k > n) el.textContent = "끝 · [⏮ 처음으로]를 누르면 다시 볼 수 있어요.";
-    else el.textContent = k + "쪽 / " + n + "쪽" + (pages[k - 1].aud ? "" : " · 이 쪽은 음성이 없습니다") + auto;
-    $("bNext").disabled = k > n; $("bPrev").disabled = k <= 0;
+    var auto = q("auto").checked ? " · 자동 넘김 켜짐" : "";
+    if(!unit || unit.key === "cover") infoEl.textContent = "표지 · [다음 ▶]이나 [▶ 소리 듣기]를 누르면 1쪽부터 읽어 줍니다." + auto;
+    else if(unit.end) infoEl.textContent = "끝 · [⏮ 처음으로]를 누르면 다시 볼 수 있어요.";
+    else {
+      var l = unit.list;
+      var label = l.length > 1 ? l[0] + "–" + l[l.length - 1] + "쪽" : l[0] + "쪽";
+      var reading = (l.length > 1 && isPlaying()) ? " · " + playerK + "쪽 읽는 중" : "";
+      var miss = l.filter(function(k){ return !pages[k - 1].aud; });
+      infoEl.textContent = label + " / " + n + "쪽" + reading +
+        (miss.length ? " · " + miss.join(", ") + "쪽은 음성이 없습니다" + missingHint : "") + auto;
+    }
+    q("prev").disabled = curIdx <= 0;
+    q("next").disabled = !pf || curIdx >= pf.getPageCount() - 1;
   }
-  function play(k, fromStart){
-    clearTimers();
-    var src = pages[k - 1] && pages[k - 1].aud;
-    if(!src){ info(); if($("bAuto").checked) timers.push(setTimeout(goNext, 3000)); return; }
+  function playK(k, fromStart){
     player.muted = false;
-    if(playerK !== k){ player.src = src; playerK = k; }
+    if(playerK !== k){ player.src = pages[k - 1].aud; playerK = k; }
     if(fromStart){ try{ player.currentTime = 0; }catch(e){} }
     var pr = player.play();
-    if(pr && pr.catch) pr.catch(function(){ updBtn(); $("info").textContent = "브라우저가 소리를 막았습니다. [▶ 소리 듣기]를 눌러 주세요."; });
-    updBtn();
+    if(pr && pr.catch) pr.catch(function(){ updBtn(); infoEl.textContent = "브라우저가 소리를 막았습니다. [▶ 소리 듣기]를 눌러 주세요."; });
+    updBtn(); info();
+  }
+  function startUnit(){          /* 펼친 쪽(들)을 처음부터 차례로 읽기 */
+    clearTimers();
+    if(!unit) return;
+    queue = unit.list.filter(function(k){ return pages[k - 1].aud; }); qi = 0;
+    if(!queue.length){
+      info();
+      if(q("auto").checked && unit.list.length) timers.push(setTimeout(goNext, 3000));
+      return;
+    }
+    playK(queue[0], true);
   }
   function onFlip(idx, quiet){
-    var k = storyOf(idx);
-    if(k !== story){
-      story = k; stop();
-      if(!quiet && k >= 1 && k <= n) timers.push(setTimeout(function(){ play(k, true); }, PRE));
+    curIdx = idx;
+    var u = unitOf(idx);
+    if(!unit || u.key !== unit.key){
+      unit = u; stop(); queue = []; qi = 0;
+      if(!quiet && u.list.length) timers.push(setTimeout(startUnit, PRE));
     }
     info();
   }
   function goNext(){
-    if(!pf || story > n) return;
-    pf.flip(story < n ? 2 * (story + 1) - 1 : 2 * n + 1);
+    if(!pf || !unit || unit.end) return;
+    if(!picOnly){ var k = unit.list[0]; pf.flip(k < n ? 2 * (k + 1) - 1 : 2 * n + 1); }   /* 좁은 화면에서도 글 쪽을 건너 다음 그림으로 */
+    else pf.flipNext();
   }
   function build(startIdx){
     stop();
     if(pf){ try{ pf.destroy(); }catch(e){} pf = null; }
-    var host = $("host"); host.innerHTML = "";
+    host.innerHTML = "";
     sizeHost();
     var book = document.createElement("div"); host.appendChild(book);
     var cover = mk("cover", true);
@@ -2260,15 +2098,25 @@ function flipbookViewer(BOOK){
     var s = document.createElement("p"); s.textContent = "책장을 넘기거나 [▶ 소리 듣기]를 누르세요";
     cover.firstChild.appendChild(h); cover.firstChild.appendChild(s); book.appendChild(cover);
     pages.forEach(function(p){
-      var pi = mk(p.img ? "image" : "image noimg");
-      if(p.img){ var im = document.createElement("img"); im.src = p.img; im.alt = p.n + "쪽 그림"; im.draggable = false; pi.firstChild.appendChild(im); }
-      else pi.firstChild.textContent = p.n + "쪽";
+      var pi = mk("image" + (picOnly ? " contain" : ""));   /* 원고가 들어 있는 그림은 글자가 잘리지 않게 전체를 보여 줌 */
+      if(p.img){
+        var im = document.createElement("img");
+        im.src = p.img; im.alt = p.n + "쪽 그림"; im.draggable = false;
+        im.style.objectPosition = (p.fx == null ? 50 : p.fx) + "% " + (p.fy == null ? 50 : p.fy) + "%";
+        pi.firstChild.appendChild(im);
+      } else {
+        var ph = document.createElement("div"); ph.className = "ph"; ph.textContent = p.n + "쪽 그림 없음";
+        pi.firstChild.appendChild(ph);
+      }
       book.appendChild(pi);
-      var pt = mk("text");
-      var tx = document.createElement("div"); tx.textContent = p.text || "";
-      var no = document.createElement("div"); no.className = "pno"; no.textContent = p.n;
-      pt.firstChild.appendChild(tx); pt.firstChild.appendChild(no); book.appendChild(pt);
+      if(!picOnly){
+        var pt = mk("text");
+        var tx = document.createElement("div"); tx.textContent = p.text || "";
+        var no = document.createElement("div"); no.className = "pno"; no.textContent = p.n;
+        pt.firstChild.appendChild(tx); pt.firstChild.appendChild(no); book.appendChild(pt);
+      }
     });
+    if(picOnly && n % 2 === 1) book.appendChild(mk("blank"));   /* 뒤표지가 혼자 오도록 쪽 수를 짝수로 */
     var back = mk("back", true);
     var e1 = document.createElement("h3"); e1.textContent = "끝";
     var e2 = document.createElement("p"); e2.textContent = "[⏮ 처음으로]를 누르면 다시 볼 수 있어요";
@@ -2279,14 +2127,15 @@ function flipbookViewer(BOOK){
       showCover: true, usePortrait: true, drawShadow: true, maxShadowOpacity: 0.5, flippingTime: 800, mobileScrollSupport: false
     });
     pf.loadFromHTML(book.querySelectorAll(".bpage"));
-    var quietUntil = Date.now() + 400;
+    var quietUntil = Date.now() + 400;   /* 다시 만들 때 쪽 위치를 되돌리는 것은 '넘김'으로 보지 않음 */
     pf.on("flip", function(ev){ onFlip(ev.data, Date.now() < quietUntil); });
     pf.on("changeOrientation", fitFont);
     fitFont();
-    story = -1;
+    unit = null;
     if(startIdx > 0){ try{ pf.turnToPage(startIdx); }catch(e){} }
     onFlip(pf.getCurrentPageIndex(), true);
   }
+  /* 아이폰 등은 첫 재생이 버튼을 누른 순간에 일어나야 하므로, 처음 누를 때 소리 없이 한 번 재생해 둔다 */
   function unlock(){
     if(unlocked) return;
     unlocked = true;
@@ -2297,78 +2146,116 @@ function flipbookViewer(BOOK){
     var done = function(){ if(playerK === -1){ player.pause(); playerK = 0; } player.muted = false; };
     if(pr && pr.then) pr.then(done, function(){ player.muted = false; playerK = 0; unlocked = false; }); else done();
   }
-  player.addEventListener("play", updBtn);
+  player.addEventListener("play", function(){ updBtn(); info(); });
   player.addEventListener("pause", updBtn);
   player.addEventListener("ended", function(){
     updBtn();
-    if(playerK > 0 && $("bAuto").checked) timers.push(setTimeout(goNext, AUTO));
-  });
-  $("stage").addEventListener("pointerdown", unlock, true);
-  $("bPlay").addEventListener("click", function(){
-    unlock();
-    if(story <= 0){ pf.flipNext(); return; }
-    if(story > n) return;
-    if(isPlaying()){ player.pause(); clearTimers(); return; }
-    play(story, !(playerK === story && player.currentTime > 0 && !player.ended));
-  });
-  $("bReplay").addEventListener("click", function(){ unlock(); if(story >= 1 && story <= n) play(story, true); });
-  $("bPrev").addEventListener("click", function(){ unlock(); pf.flipPrev(); });
-  $("bNext").addEventListener("click", function(){ unlock(); pf.flipNext(); });
-  $("bFirst").addEventListener("click", function(){ stop(); pf.turnToPage(0); onFlip(0, true); });
-  $("bAuto").addEventListener("change", function(){
+    if(playerK <= 0 || !alive) return;
+    if(qi < queue.length - 1 && queue[qi] === playerK){
+      qi++;
+      var k = queue[qi];
+      timers.push(setTimeout(function(){ playK(k, true); }, GAP));
+    } else if(q("auto").checked){
+      timers.push(setTimeout(goNext, AUTO));
+    }
     info();
-    if(this.checked && story >= 1 && story <= n && playerK === story && player.ended) timers.push(setTimeout(goNext, AUTO));
   });
-  $("bFull").addEventListener("click", function(){
-    if(document.fullscreenElement) document.exitFullscreen();
-    else if($("stage").requestFullscreen) $("stage").requestFullscreen().catch(function(){});
-  });
-  var rt = null;
-  function rebuild(){
+  stage.addEventListener("pointerdown", unlock, true);
+  q("play").addEventListener("click", function(){
     if(!pf) return;
-    var idx = pf.getCurrentPageIndex(), was = isPlaying();
+    unlock();
+    if(!unit || unit.key === "cover"){ pf.flipNext(); return; }   /* 표지 → 1쪽을 펼치면 읽기 시작 */
+    if(unit.end) return;
+    if(isPlaying()){ player.pause(); clearTimers(); return; }
+    if(queue.length && playerK === queue[qi] && player.currentTime > 0 && !player.ended) playK(playerK, false);
+    else startUnit();
+  });
+  q("replay").addEventListener("click", function(){ unlock(); if(unit && unit.list.length) startUnit(); });
+  q("prev").addEventListener("click", function(){ if(pf){ unlock(); pf.flipPrev(); } });
+  q("next").addEventListener("click", function(){ if(pf){ unlock(); pf.flipNext(); } });
+  q("first").addEventListener("click", function(){
+    if(!pf) return;
+    stop(); pf.turnToPage(0); unit = null; onFlip(0, true);
+  });
+  q("auto").addEventListener("change", function(){
+    info();
+    if(this.checked && unit && unit.list.length && !isPlaying() && queue.length && playerK === queue[queue.length - 1] && player.ended){
+      timers.push(setTimeout(goNext, AUTO));
+    }
+  });
+  q("full").addEventListener("click", function(){
+    if(document.fullscreenElement) document.exitFullscreen();
+    else if(stage.requestFullscreen) stage.requestFullscreen().catch(function(){});
+  });
+  function rebuild(){
+    if(!pf || !alive) return;
+    var idx = pf.getCurrentPageIndex(), was = isPlaying(), k = playerK;
     build(idx);
-    if(was && story === playerK) play(story, false);
+    if(was && unit && unit.list.indexOf(k) >= 0){   /* 읽던 곳부터 이어서 */
+      queue = unit.list.filter(function(x){ return pages[x - 1].aud; });
+      qi = Math.max(0, queue.indexOf(k));
+      playK(k, false);
+    }
   }
-  window.addEventListener("resize", function(){ clearTimeout(rt); rt = setTimeout(rebuild, 250); });
-  document.addEventListener("fullscreenchange", function(){
-    $("bFull").textContent = document.fullscreenElement ? "전체 화면 끝내기" : "전체 화면";
+  var rt = null;
+  function onResize(){ if(!alive || !active()) return; clearTimeout(rt); rt = setTimeout(rebuild, 250); }
+  function onFs(){
+    if(!alive) return;
+    q("full").textContent = document.fullscreenElement === stage ? "전체 화면 끝내기" : "전체 화면";
     clearTimeout(rt); rt = setTimeout(rebuild, 150);
-  });
-  document.addEventListener("keydown", function(e){
-    if(e.altKey || e.ctrlKey || e.metaKey || !pf) return;
+  }
+  function onKey(e){
+    if(!alive || !active() || !pf) return;
+    var tag = (e.target && e.target.tagName || "").toLowerCase();
+    if((tag === "input" && e.target.type !== "checkbox") || tag === "textarea" || tag === "select" || e.altKey || e.ctrlKey || e.metaKey) return;
     if(e.key === "ArrowLeft"){ e.preventDefault(); unlock(); pf.flipPrev(); }
-    if(e.key === "ArrowRight"){ e.preventDefault(); unlock(); pf.flipNext(); }
-    if(e.key === " " && (e.target.tagName || "").toLowerCase() !== "button"){ e.preventDefault(); $("bPlay").click(); }
-  });
+    else if(e.key === "ArrowRight"){ e.preventDefault(); unlock(); pf.flipNext(); }
+    else if(e.key === " " && tag !== "button"){ e.preventDefault(); q("play").click(); }
+  }
+  window.addEventListener("resize", onResize);
+  document.addEventListener("fullscreenchange", onFs);
+  document.addEventListener("keydown", onKey);
   build(0);
+  return {
+    stop: stop,
+    refresh: rebuild,
+    destroy: function(){
+      alive = false; stop();
+      window.removeEventListener("resize", onResize);
+      document.removeEventListener("fullscreenchange", onFs);
+      document.removeEventListener("keydown", onKey);
+      if(pf){ try{ pf.destroy(); }catch(e){} pf = null; }
+      root.innerHTML = "";
+    }
+  };
 }
 var VIEWER_CSS = [
-  "*{box-sizing:border-box;margin:0;padding:0;}",
-  "html,body{min-height:100%;}",
-  "body{font-family:'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:#3A332B;color:#2B2A26;}",
-  ".stage{min-height:100vh;padding:22px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#3A332B;}",
-  "#host{margin:0 auto;}",
-  ".bpage{background:#FFFDF8;overflow:hidden;}",
-  ".bpage .fill{position:absolute;inset:0;}",
-  ".bpage img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;pointer-events:none;}",
-  ".bpage.noimg .fill{display:flex;align-items:center;justify-content:center;color:#6E6A5E;background:#F1EBDD;}",
-  ".bpage.text .fill{display:flex;flex-direction:column;justify-content:center;padding:12% 11%;background:#FFFDF8;color:#2B2A26;font-size:var(--bfont,18px);line-height:1.9;font-weight:500;word-break:keep-all;}",
-  ".bpage.text .pno{position:absolute;bottom:5%;left:0;right:0;text-align:center;font-size:0.7em;color:#6E6A5E;}",
-  ".bpage.cover .fill,.bpage.back .fill{background:#0E7C74;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12%;gap:0.8em;}",
-  ".bpage.cover h3{font-size:calc(var(--bfont,18px) * 1.7);font-weight:900;line-height:1.35;word-break:keep-all;}",
-  ".bpage.cover p,.bpage.back p{font-size:calc(var(--bfont,18px) * 0.8);opacity:.85;}",
-  ".bpage.back h3{font-size:calc(var(--bfont,18px) * 1.6);font-weight:900;}",
-  ".ctl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;}",
-  ".ctl button{border:1px solid #CFC5B0;border-radius:9px;background:#FBF6EC;color:#2B2A26;font-family:inherit;font-size:0.9rem;font-weight:700;padding:9px 14px;cursor:pointer;}",
-  ".ctl button:hover{background:#fff;}",
-  ".ctl button:disabled{opacity:.4;cursor:not-allowed;}",
-  ".ctl button.play{background:#E8630A;border-color:#E8630A;color:#fff;min-width:118px;}",
-  ".ctl label{color:#F3EBDD;font-size:0.85rem;display:flex;align-items:center;gap:5px;cursor:pointer;}",
-  ".info{color:#F3EBDD;font-size:0.85rem;min-height:1.4em;text-align:center;}",
-  ".foot{color:#A99F8C;font-size:0.75rem;text-align:center;}",
-  "@media(max-width:640px){.stage{padding:14px 6px;}.ctl button{padding:8px 10px;font-size:0.85rem;}}"
+  ".fb-stage{background:#3A332B;border-radius:12px;padding:22px 12px;display:flex;flex-direction:column;align-items:center;gap:14px;font-family:'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif;}",
+  ".fb-stage:fullscreen{border-radius:0;justify-content:center;padding:20px;}",
+  ".fb-host{margin:0 auto;}",
+  ".fb-stage .bpage{background:#FFFDF8;overflow:hidden;}",
+  ".fb-stage .bpage .fill{position:absolute;inset:0;}",
+  ".fb-stage .bpage img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;pointer-events:none;}",
+  ".fb-stage .bpage .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#6E6A5E;background:#F1EBDD;font-size:var(--bfont,18px);}",
+  ".fb-stage .bpage.text .fill{display:flex;flex-direction:column;justify-content:center;padding:12% 11%;color:#2B2A26;font-size:var(--bfont,18px);line-height:1.9;font-weight:500;word-break:keep-all;}",
+  ".fb-stage .bpage.text .pno{position:absolute;bottom:5%;left:0;right:0;text-align:center;font-size:0.7em;color:#6E6A5E;}",
+  ".fb-stage .bpage.contain img{object-fit:contain;background:#FFFDF8;}",
+  ".fb-stage .bpage.cover .fill,.fb-stage .bpage.back .fill{background:#0E7C74;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12%;gap:0.8em;}",
+  ".fb-stage .bpage.cover h3{font-size:calc(var(--bfont,18px) * 1.7);font-weight:900;line-height:1.35;word-break:keep-all;}",
+  ".fb-stage .bpage.cover p,.fb-stage .bpage.back p{font-size:calc(var(--bfont,18px) * 0.8);opacity:.85;}",
+  ".fb-stage .bpage.back h3{font-size:calc(var(--bfont,18px) * 1.6);font-weight:900;}",
+  ".fb-ctl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;}",
+  ".fb-ctl button{border:1px solid #CFC5B0;border-radius:9px;background:#FBF6EC;color:#2B2A26;font-family:inherit;font-size:0.9rem;font-weight:700;padding:9px 14px;cursor:pointer;}",
+  ".fb-ctl button:hover{background:#fff;}",
+  ".fb-ctl button:disabled{opacity:.4;cursor:not-allowed;}",
+  ".fb-ctl button.play{background:#E8630A;border-color:#E8630A;color:#fff;min-width:118px;}",
+  ".fb-ctl label{color:#F3EBDD;font-size:0.85rem;display:flex;align-items:center;gap:5px;cursor:pointer;}",
+  ".fb-info{color:#F3EBDD;font-size:0.85rem;min-height:1.4em;text-align:center;}",
+  ".fb-foot{color:#A99F8C;font-size:0.75rem;text-align:center;}",
+  "@media(max-width:640px){.fb-stage{padding:14px 6px;}.fb-ctl button{padding:8px 10px;font-size:0.85rem;}}"
 ].join("\n");
+var EXPORT_PAGE_CSS = "*{box-sizing:border-box;margin:0;padding:0;}\nbody{background:#3A332B;}\n.fb-stage{min-height:100vh;border-radius:0;justify-content:center;}";
+(function(){ var st = document.createElement("style"); st.textContent = VIEWER_CSS; document.head.appendChild(st); })();
 
 function blobToDataURL(blob){
   return new Promise(function(resolve, reject){
@@ -2385,11 +2272,21 @@ function audioDataURL(rec){
   return blobToDataURL(new Blob([rec.blob], { type: type }));
 }
 /* 7단계 화면과 같게(책 비율로 덮기 + 자를 위치) 잘라 JPG로 줄인다 */
-function bakeImage(rec, ratio){
+function bakeImage(rec, ratio, whole){
   return new Promise(function(resolve, reject){
     var im = new Image();
     im.onload = function(){
       var iw = im.naturalWidth, ih = im.naturalHeight;
+      if(whole){   /* 원고가 들어 있는 그림: 자르지 않고 책 비율 종이 위에 전체를 놓음 (남는 곳은 종이색) */
+        var bw = Math.max(iw, ih / ratio), bh = bw * ratio;
+        var sc = Math.min(1, EXPORT_MAX_SIDE / Math.max(bw, bh));
+        var cv = document.createElement("canvas"); cv.width = Math.round(bw * sc); cv.height = Math.round(bh * sc);
+        var cx = cv.getContext("2d");
+        cx.fillStyle = "#FFFDF8"; cx.fillRect(0, 0, cv.width, cv.height);
+        cx.drawImage(im, (cv.width - iw * sc) / 2, (cv.height - ih * sc) / 2, iw * sc, ih * sc);
+        resolve(cv.toDataURL("image/jpeg", EXPORT_JPEG_Q));
+        return;
+      }
       var visW = iw, visH = iw * ratio;
       if(visH > ih){ visH = ih; visW = ih / ratio; }
       var sx = (iw - visW) * (rec.fx / 100), sy = (ih - visH) * (rec.fy / 100);
@@ -2413,7 +2310,7 @@ function buildExportHtml(book, lib){
     "<title>" + title + " · 오디오 플립북</title>\n" +
     "<meta name=\"generator\" content=\"동화책 프롬프트 생성기 V8 · 오디오 플립북 / 책장 넘김: page-flip 2.0.7 (MIT License, https://github.com/Nodlik/StPageFlip)\">\n" +
     "<link href=\"https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap\" rel=\"stylesheet\">\n" +
-    "<style>\n" + VIEWER_CSS + "\n</style>\n</head>\n<body>\n" +
+    "<style>\n" + EXPORT_PAGE_CSS + "\n" + VIEWER_CSS + "\n</style>\n</head>\n<body>\n" +
     "<noscript>이 파일은 크롬·엣지·사파리 같은 브라우저에서 열어 주세요.</noscript>\n" +
     /* 이 앱 자체가 <script> 안에 있으므로 닫는 태그는 <\/script> 로 적는다 */
     "<script>\n" + lib.replace(/<\/script/gi, "<\\/script") + "\n<\/script>\n" +
@@ -2427,14 +2324,15 @@ function makeExportHtml(){
   }, function(){ throw new Error("책장 넘김 기능을 내려받지 못했습니다. 인터넷 연결을 확인해 주세요."); });
   var pageP = Promise.all(pages.map(function(p){
     var ir = media.img[p.n], ar = media.aud[p.n];
-    return Promise.all([ir ? bakeImage(ir, ratio) : null, ar ? audioDataURL(ar) : null]).then(function(x){
+    return Promise.all([ir ? bakeImage(ir, ratio, textInImage()) : null, ar ? audioDataURL(ar) : null]).then(function(x){
       return { n: p.n, text: p.text, img: x[0], aud: x[1] };
     });
   }));
   return Promise.all([libP, pageP]).then(function(r){
     var book = {
       title: document.getElementById("s1concept").value.trim() || "나의 동화책",
-      ratio: ratio, made: new Date().toISOString().slice(0, 10), pages: r[1]
+      ratio: ratio, made: new Date().toISOString().slice(0, 10),
+      layout: bookLayout(), pages: r[1]
     };
     return buildExportHtml(book, r[0]);
   });
@@ -2470,6 +2368,7 @@ document.getElementById("bkSave").addEventListener("click", function(){
 });
 
 function initMedia(){
+  syncTii();
   idbAll().then(function(all){
     Object.keys(all).forEach(function(key){
       var m = key.match(/^(img|aud):(\d+)$/);
