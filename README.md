@@ -2,7 +2,9 @@
 
 `동화책 프롬프트 생성기_V7_에셋/index.html`(2026.11.01)에 5~7단계를 더한 버전 (2026.11.01). V7 폴더는 그대로 두었다.
 
-- **배포**: 아직 안 함 (V7 주소는 https://story-claude-v7.vercel.app/)
+- **배포 주소**: https://story-claude-v8.vercel.app/
+- **저장소**: https://github.com/KYUNGHA-LEE/story-claude-v8 (main에 푸시하면 Vercel 프로젝트 `story-claude-v8`이 자동 배포)
+- V7은 그대로: https://story-claude-v7.vercel.app/
 
 ## V8에서 더한 것
 
