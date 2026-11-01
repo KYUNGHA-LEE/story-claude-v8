@@ -355,6 +355,13 @@
   .bookctl button.play{background:var(--orange);border-color:var(--orange);color:#fff;min-width:118px;}
   .bookctl label{color:#F3EBDD;font-size:0.85rem;display:flex;align-items:center;gap:5px;cursor:pointer;}
   .bookinfo{color:#F3EBDD;font-size:0.85rem;min-height:1.4em;text-align:center;}
+  .exportbox{
+    margin-top:14px;border:2px solid var(--orange);border-radius:12px;background:var(--orange-soft);
+    padding:14px 16px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  }
+  .exportbox b{color:var(--orange-dark);font-size:0.95rem;}
+  .exportbox p{font-size:0.82rem;color:var(--ink);margin-top:4px;max-width:560px;}
+  .exportbox .done{font-size:0.82rem;color:var(--teal-dark);font-weight:700;margin-top:6px;}
   @media(max-width:640px){
     #panel7{padding:16px 10px;}
     .bookstage{padding:14px 6px;}
@@ -613,6 +620,13 @@
         <label><input type="checkbox" id="bkAuto"> 자동 넘김</label>
         <button type="button" id="bkFull">전체 화면</button>
       </div>
+    </div>
+    <div class="exportbox">
+      <div>
+        <b>완성된 플립북을 파일 하나로 받기</b>
+        <p>그림·음성·책장 넘김이 모두 들어 있는 HTML 파일 하나를 받습니다. 더블클릭하면 인터넷 없이도 크롬·엣지 등에서 열리고, 카톡·메일로 보낼 수 있습니다. 그림은 책 크기에 맞게 잘라 JPG로 줄여 넣습니다.</p>
+      </div>
+      <button class="btn primary" id="bkSave" type="button">⬇ 플립북 파일로 받기</button>
     </div>
     <div class="error" id="err7"></div>
     <div class="nav" style="margin-top:14px;">
@@ -2161,6 +2175,298 @@ window.addEventListener("resize", function(){ clearTimeout(resizeT); resizeT = s
 document.addEventListener("fullscreenchange", function(){
   document.getElementById("bkFull").textContent = document.fullscreenElement ? "전체 화면 끝내기" : "전체 화면";
   clearTimeout(resizeT); resizeT = setTimeout(rebuildKeepingPage, 150);
+});
+
+/* ---------- 7단계: 플립북 HTML 파일 하나로 받기 ----------
+   받은 파일에는 page-flip 라이브러리 원문, 그림(JPG), 음성, 아래 flipbookViewer 함수가 모두 들어간다.
+   flipbookViewer는 받은 파일 안에서만 실행되므로 앱의 변수·함수를 쓰지 않는다 (7단계 화면과 같은 동작) */
+var PAGEFLIP_URL = "https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js";
+var EXPORT_MAX_SIDE = 1600;      /* 받는 그림의 긴 변 최대 픽셀 */
+var EXPORT_JPEG_Q = 0.86;
+
+function flipbookViewer(BOOK){
+  var $ = function(id){ return document.getElementById(id); };
+  document.body.innerHTML =
+    '<div class="stage" id="stage"><div id="host"></div><div class="info" id="info"></div>' +
+    '<div class="ctl"><button type="button" id="bFirst">⏮ 처음으로</button><button type="button" id="bPrev">◀ 이전</button>' +
+    '<button type="button" class="play" id="bPlay">▶ 소리 듣기</button><button type="button" id="bReplay">↺ 다시 듣기</button>' +
+    '<button type="button" id="bNext">다음 ▶</button><label><input type="checkbox" id="bAuto"> 자동 넘김</label>' +
+    '<button type="button" id="bFull">전체 화면</button></div><p class="foot" id="foot"></p></div>';
+  $("foot").textContent = BOOK.title + " · 오디오 플립북 (" + BOOK.made + ")";
+  var pages = BOOK.pages, n = pages.length, ratio = BOOK.ratio || 1;
+  var pf = null, story = -1, player = new Audio(), playerK = 0, timers = [], unlocked = false;
+  var PRE = 450, AUTO = 1500;
+  function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+  function isPlaying(){ return playerK > 0 && !player.paused && !player.ended; }
+  function updBtn(){ $("bPlay").textContent = isPlaying() ? "⏸ 멈춤" : "▶ 소리 듣기"; }
+  function stop(){ clearTimers(); try{ player.pause(); }catch(e){} updBtn(); }
+  function storyOf(idx){ if(idx <= 0) return 0; var k = Math.ceil(idx / 2); return k > n ? n + 1 : k; }
+  function mk(cls, hard){
+    var d = document.createElement("div"); d.className = "bpage " + cls;
+    if(hard) d.setAttribute("data-density", "hard");
+    var f = document.createElement("div"); f.className = "fill"; d.appendChild(f);
+    return d;
+  }
+  function sizeHost(){
+    var stage = $("stage"), host = $("host");
+    var availW = stage.clientWidth - (window.innerWidth <= 640 ? 12 : 24);
+    var availH = Math.max(260, window.innerHeight - 160);
+    host.style.width = Math.max(200, Math.floor(Math.min(availW, availH / ratio * 2))) + "px";
+  }
+  function fitFont(){
+    if(!pf) return;
+    var host = $("host");
+    var pw = host.clientWidth / (pf.getOrientation() === "portrait" ? 1 : 2);
+    host.style.setProperty("--bfont", Math.max(12, Math.min(34, pw * 0.052)).toFixed(1) + "px");
+  }
+  function info(){
+    var el = $("info"), k = story, auto = $("bAuto").checked ? " · 자동 넘김 켜짐" : "";
+    if(k <= 0) el.textContent = "표지 · [다음 ▶]이나 [▶ 소리 듣기]를 누르면 1쪽부터 읽어 줍니다." + auto;
+    else if(k > n) el.textContent = "끝 · [⏮ 처음으로]를 누르면 다시 볼 수 있어요.";
+    else el.textContent = k + "쪽 / " + n + "쪽" + (pages[k - 1].aud ? "" : " · 이 쪽은 음성이 없습니다") + auto;
+    $("bNext").disabled = k > n; $("bPrev").disabled = k <= 0;
+  }
+  function play(k, fromStart){
+    clearTimers();
+    var src = pages[k - 1] && pages[k - 1].aud;
+    if(!src){ info(); if($("bAuto").checked) timers.push(setTimeout(goNext, 3000)); return; }
+    player.muted = false;
+    if(playerK !== k){ player.src = src; playerK = k; }
+    if(fromStart){ try{ player.currentTime = 0; }catch(e){} }
+    var pr = player.play();
+    if(pr && pr.catch) pr.catch(function(){ updBtn(); $("info").textContent = "브라우저가 소리를 막았습니다. [▶ 소리 듣기]를 눌러 주세요."; });
+    updBtn();
+  }
+  function onFlip(idx, quiet){
+    var k = storyOf(idx);
+    if(k !== story){
+      story = k; stop();
+      if(!quiet && k >= 1 && k <= n) timers.push(setTimeout(function(){ play(k, true); }, PRE));
+    }
+    info();
+  }
+  function goNext(){
+    if(!pf || story > n) return;
+    pf.flip(story < n ? 2 * (story + 1) - 1 : 2 * n + 1);
+  }
+  function build(startIdx){
+    stop();
+    if(pf){ try{ pf.destroy(); }catch(e){} pf = null; }
+    var host = $("host"); host.innerHTML = "";
+    sizeHost();
+    var book = document.createElement("div"); host.appendChild(book);
+    var cover = mk("cover", true);
+    var h = document.createElement("h3"); h.textContent = BOOK.title;
+    var s = document.createElement("p"); s.textContent = "책장을 넘기거나 [▶ 소리 듣기]를 누르세요";
+    cover.firstChild.appendChild(h); cover.firstChild.appendChild(s); book.appendChild(cover);
+    pages.forEach(function(p){
+      var pi = mk(p.img ? "image" : "image noimg");
+      if(p.img){ var im = document.createElement("img"); im.src = p.img; im.alt = p.n + "쪽 그림"; im.draggable = false; pi.firstChild.appendChild(im); }
+      else pi.firstChild.textContent = p.n + "쪽";
+      book.appendChild(pi);
+      var pt = mk("text");
+      var tx = document.createElement("div"); tx.textContent = p.text || "";
+      var no = document.createElement("div"); no.className = "pno"; no.textContent = p.n;
+      pt.firstChild.appendChild(tx); pt.firstChild.appendChild(no); book.appendChild(pt);
+    });
+    var back = mk("back", true);
+    var e1 = document.createElement("h3"); e1.textContent = "끝";
+    var e2 = document.createElement("p"); e2.textContent = "[⏮ 처음으로]를 누르면 다시 볼 수 있어요";
+    back.firstChild.appendChild(e1); back.firstChild.appendChild(e2); book.appendChild(back);
+    pf = new St.PageFlip(book, {
+      width: 500, height: Math.round(500 * ratio), size: "stretch",
+      minWidth: 220, maxWidth: 1400, minHeight: Math.round(220 * ratio), maxHeight: Math.round(1400 * ratio),
+      showCover: true, usePortrait: true, drawShadow: true, maxShadowOpacity: 0.5, flippingTime: 800, mobileScrollSupport: false
+    });
+    pf.loadFromHTML(book.querySelectorAll(".bpage"));
+    var quietUntil = Date.now() + 400;
+    pf.on("flip", function(ev){ onFlip(ev.data, Date.now() < quietUntil); });
+    pf.on("changeOrientation", fitFont);
+    fitFont();
+    story = -1;
+    if(startIdx > 0){ try{ pf.turnToPage(startIdx); }catch(e){} }
+    onFlip(pf.getCurrentPageIndex(), true);
+  }
+  function unlock(){
+    if(unlocked) return;
+    unlocked = true;
+    var first = pages.filter(function(p){ return p.aud; })[0];
+    if(!first || playerK > 0) return;
+    player.muted = true; player.src = first.aud; playerK = -1;
+    var pr = player.play();
+    var done = function(){ if(playerK === -1){ player.pause(); playerK = 0; } player.muted = false; };
+    if(pr && pr.then) pr.then(done, function(){ player.muted = false; playerK = 0; unlocked = false; }); else done();
+  }
+  player.addEventListener("play", updBtn);
+  player.addEventListener("pause", updBtn);
+  player.addEventListener("ended", function(){
+    updBtn();
+    if(playerK > 0 && $("bAuto").checked) timers.push(setTimeout(goNext, AUTO));
+  });
+  $("stage").addEventListener("pointerdown", unlock, true);
+  $("bPlay").addEventListener("click", function(){
+    unlock();
+    if(story <= 0){ pf.flipNext(); return; }
+    if(story > n) return;
+    if(isPlaying()){ player.pause(); clearTimers(); return; }
+    play(story, !(playerK === story && player.currentTime > 0 && !player.ended));
+  });
+  $("bReplay").addEventListener("click", function(){ unlock(); if(story >= 1 && story <= n) play(story, true); });
+  $("bPrev").addEventListener("click", function(){ unlock(); pf.flipPrev(); });
+  $("bNext").addEventListener("click", function(){ unlock(); pf.flipNext(); });
+  $("bFirst").addEventListener("click", function(){ stop(); pf.turnToPage(0); onFlip(0, true); });
+  $("bAuto").addEventListener("change", function(){
+    info();
+    if(this.checked && story >= 1 && story <= n && playerK === story && player.ended) timers.push(setTimeout(goNext, AUTO));
+  });
+  $("bFull").addEventListener("click", function(){
+    if(document.fullscreenElement) document.exitFullscreen();
+    else if($("stage").requestFullscreen) $("stage").requestFullscreen().catch(function(){});
+  });
+  var rt = null;
+  function rebuild(){
+    if(!pf) return;
+    var idx = pf.getCurrentPageIndex(), was = isPlaying();
+    build(idx);
+    if(was && story === playerK) play(story, false);
+  }
+  window.addEventListener("resize", function(){ clearTimeout(rt); rt = setTimeout(rebuild, 250); });
+  document.addEventListener("fullscreenchange", function(){
+    $("bFull").textContent = document.fullscreenElement ? "전체 화면 끝내기" : "전체 화면";
+    clearTimeout(rt); rt = setTimeout(rebuild, 150);
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.altKey || e.ctrlKey || e.metaKey || !pf) return;
+    if(e.key === "ArrowLeft"){ e.preventDefault(); unlock(); pf.flipPrev(); }
+    if(e.key === "ArrowRight"){ e.preventDefault(); unlock(); pf.flipNext(); }
+    if(e.key === " " && (e.target.tagName || "").toLowerCase() !== "button"){ e.preventDefault(); $("bPlay").click(); }
+  });
+  build(0);
+}
+var VIEWER_CSS = [
+  "*{box-sizing:border-box;margin:0;padding:0;}",
+  "html,body{min-height:100%;}",
+  "body{font-family:'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:#3A332B;color:#2B2A26;}",
+  ".stage{min-height:100vh;padding:22px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#3A332B;}",
+  "#host{margin:0 auto;}",
+  ".bpage{background:#FFFDF8;overflow:hidden;}",
+  ".bpage .fill{position:absolute;inset:0;}",
+  ".bpage img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;pointer-events:none;}",
+  ".bpage.noimg .fill{display:flex;align-items:center;justify-content:center;color:#6E6A5E;background:#F1EBDD;}",
+  ".bpage.text .fill{display:flex;flex-direction:column;justify-content:center;padding:12% 11%;background:#FFFDF8;color:#2B2A26;font-size:var(--bfont,18px);line-height:1.9;font-weight:500;word-break:keep-all;}",
+  ".bpage.text .pno{position:absolute;bottom:5%;left:0;right:0;text-align:center;font-size:0.7em;color:#6E6A5E;}",
+  ".bpage.cover .fill,.bpage.back .fill{background:#0E7C74;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12%;gap:0.8em;}",
+  ".bpage.cover h3{font-size:calc(var(--bfont,18px) * 1.7);font-weight:900;line-height:1.35;word-break:keep-all;}",
+  ".bpage.cover p,.bpage.back p{font-size:calc(var(--bfont,18px) * 0.8);opacity:.85;}",
+  ".bpage.back h3{font-size:calc(var(--bfont,18px) * 1.6);font-weight:900;}",
+  ".ctl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;}",
+  ".ctl button{border:1px solid #CFC5B0;border-radius:9px;background:#FBF6EC;color:#2B2A26;font-family:inherit;font-size:0.9rem;font-weight:700;padding:9px 14px;cursor:pointer;}",
+  ".ctl button:hover{background:#fff;}",
+  ".ctl button:disabled{opacity:.4;cursor:not-allowed;}",
+  ".ctl button.play{background:#E8630A;border-color:#E8630A;color:#fff;min-width:118px;}",
+  ".ctl label{color:#F3EBDD;font-size:0.85rem;display:flex;align-items:center;gap:5px;cursor:pointer;}",
+  ".info{color:#F3EBDD;font-size:0.85rem;min-height:1.4em;text-align:center;}",
+  ".foot{color:#A99F8C;font-size:0.75rem;text-align:center;}",
+  "@media(max-width:640px){.stage{padding:14px 6px;}.ctl button{padding:8px 10px;font-size:0.85rem;}}"
+].join("\n");
+
+function blobToDataURL(blob){
+  return new Promise(function(resolve, reject){
+    var r = new FileReader();
+    r.onload = function(){ resolve(r.result); };
+    r.onerror = function(){ reject(r.error); };
+    r.readAsDataURL(blob);
+  });
+}
+var AUDIO_MIME = { mp3: "audio/mpeg", wav: "audio/wav", m4a: "audio/mp4", aac: "audio/aac", ogg: "audio/ogg", oga: "audio/ogg", flac: "audio/flac", webm: "audio/webm" };
+function audioDataURL(rec){
+  var ext = (rec.name.match(/\.([a-z0-9]+)$/i) || [])[1];
+  var type = rec.blob.type || AUDIO_MIME[(ext || "").toLowerCase()] || "audio/mpeg";
+  return blobToDataURL(new Blob([rec.blob], { type: type }));
+}
+/* 7단계 화면과 같게(책 비율로 덮기 + 자를 위치) 잘라 JPG로 줄인다 */
+function bakeImage(rec, ratio){
+  return new Promise(function(resolve, reject){
+    var im = new Image();
+    im.onload = function(){
+      var iw = im.naturalWidth, ih = im.naturalHeight;
+      var visW = iw, visH = iw * ratio;
+      if(visH > ih){ visH = ih; visW = ih / ratio; }
+      var sx = (iw - visW) * (rec.fx / 100), sy = (ih - visH) * (rec.fy / 100);
+      var scale = Math.min(1, EXPORT_MAX_SIDE / Math.max(visW, visH));
+      var cw = Math.round(visW * scale), ch = Math.round(visH * scale);
+      var c = document.createElement("canvas"); c.width = cw; c.height = ch;
+      var ctx = c.getContext("2d");
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cw, ch);
+      ctx.drawImage(im, sx, sy, visW, visH, 0, 0, cw, ch);
+      resolve(c.toDataURL("image/jpeg", EXPORT_JPEG_Q));
+    };
+    im.onerror = function(){ reject(new Error("그림을 읽지 못했습니다: " + rec.name)); };
+    im.src = rec.url;
+  });
+}
+function buildExportHtml(book, lib){
+  var json = JSON.stringify(book).replace(/</g, "\\u003c");
+  var title = book.title.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  return "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n" +
+    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+    "<title>" + title + " · 오디오 플립북</title>\n" +
+    "<meta name=\"generator\" content=\"동화책 프롬프트 생성기 V8 · 오디오 플립북 / 책장 넘김: page-flip 2.0.7 (MIT License, https://github.com/Nodlik/StPageFlip)\">\n" +
+    "<link href=\"https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap\" rel=\"stylesheet\">\n" +
+    "<style>\n" + VIEWER_CSS + "\n</style>\n</head>\n<body>\n" +
+    "<noscript>이 파일은 크롬·엣지·사파리 같은 브라우저에서 열어 주세요.</noscript>\n" +
+    /* 이 앱 자체가 <script> 안에 있으므로 닫는 태그는 <\/script> 로 적는다 */
+    "<script>\n" + lib.replace(/<\/script/gi, "<\\/script") + "\n<\/script>\n" +
+    "<script>\n\"use strict\";\n(" + flipbookViewer.toString() + ")(" + json + ");\n<\/script>\n</body>\n</html>\n";
+}
+function makeExportHtml(){
+  var pages = storyPages(), ratio = bookRatio();
+  var libP = fetch(PAGEFLIP_URL).then(function(r){
+    if(!r.ok) throw new Error("책장 넘김 기능을 내려받지 못했습니다 (HTTP " + r.status + ")");
+    return r.text();
+  }, function(){ throw new Error("책장 넘김 기능을 내려받지 못했습니다. 인터넷 연결을 확인해 주세요."); });
+  var pageP = Promise.all(pages.map(function(p){
+    var ir = media.img[p.n], ar = media.aud[p.n];
+    return Promise.all([ir ? bakeImage(ir, ratio) : null, ar ? audioDataURL(ar) : null]).then(function(x){
+      return { n: p.n, text: p.text, img: x[0], aud: x[1] };
+    });
+  }));
+  return Promise.all([libP, pageP]).then(function(r){
+    var book = {
+      title: document.getElementById("s1concept").value.trim() || "나의 동화책",
+      ratio: ratio, made: new Date().toISOString().slice(0, 10), pages: r[1]
+    };
+    return buildExportHtml(book, r[0]);
+  });
+}
+document.getElementById("bkSave").addEventListener("click", function(){
+  var btn = this;
+  clearError(7);
+  var pages = storyPages();
+  if(!pages.length){ showError(7, "쪽이 없습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 3단계 원고를 먼저 만들어 주세요."); return; }
+  var noImg = pages.filter(function(p){ return !media.img[p.n]; }).map(function(p){ return p.n; });
+  var noAud = pages.filter(function(p){ return !media.aud[p.n]; }).map(function(p){ return p.n; });
+  if((noImg.length || noAud.length) && !confirm(
+    (noImg.length ? "그림이 없는 쪽: " + noImg.join(", ") + "\n" : "") +
+    (noAud.length ? "음성이 없는 쪽: " + noAud.join(", ") + "\n" : "") + "\n그래도 받을까요?")) return;
+  btn.disabled = true; btn.textContent = "만드는 중…";
+  var old = btn.parentNode.querySelector(".done"); if(old) old.remove();
+  makeExportHtml().then(function(html){
+    var blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    var title = (document.getElementById("s1concept").value.trim() || "동화책").replace(/[\\/:*?"<>|]/g, "").slice(0, 30);
+    a.download = title + "_오디오플립북_" + stamp() + ".html";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 10000);
+    var done = document.createElement("div"); done.className = "done";
+    done.textContent = "받기 완료: " + a.download + " (" + (blob.size / 1048576).toFixed(1) + "MB) · 다운로드 폴더를 확인하세요.";
+    btn.parentNode.querySelector("div").appendChild(done);
+  }).catch(function(e){
+    showError(7, "플립북 파일을 만들지 못했습니다.\n" + e.message);
+  }).then(function(){
+    btn.disabled = false; btn.textContent = "⬇ 플립북 파일로 받기";
+  });
 });
 
 function initMedia(){
