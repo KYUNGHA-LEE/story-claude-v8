@@ -1,0 +1,2193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>동화책 프롬프트 생성기 V8 · 오디오 플립북</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTQiIGZpbGw9IiMwRTdDNzQiLz48IS0tIO2OvOy5nCDssYUgLS0+PHBhdGggZD0iTTEyIDIwIFEyMiAxNiAzMiAyMiBMMzIgNTAgUTIyIDQ0IDEyIDQ4IFoiIGZpbGw9IiNGQkY2RUMiLz48cGF0aCBkPSJNNTIgMjAgUTQyIDE2IDMyIDIyIEwzMiA1MCBRNDIgNDQgNTIgNDggWiIgZmlsbD0iI0ZERUJEQyIvPjxwYXRoIGQ9Ik0zMiAyMiBMMzIgNTAiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIi8+PCEtLSDquIDspIQgLS0+PHBhdGggZD0iTTE3IDI4IEwyNyAyNiBNMTcgMzQgTDI3IDMyIE0xNyA0MCBMMjcgMzgiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii42Ii8+PCEtLSDrp4jrspUg67OEIC0tPjxwYXRoIGQ9Ik00MiAyNiBsMi4yIDQuNCA0LjguNy0zLjUgMy40LjggNC44LTQuMy0yLjMtNC4zIDIuMy44LTQuOC0zLjUtMy40IDQuOC0uN3oiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSI0OCIgY3k9IjE0IiByPSIyLjIiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSIxNCIgY3k9IjE0IiByPSIxLjYiIGZpbGw9IiNGREVCREMiLz48L3N2Zz4=">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF6EC;
+    --card:#FFFFFF;
+    --ink:#2B2A26;
+    --muted:#6E6A5E;
+    --line:#E3DAC6;
+    --teal:#0E7C74;
+    --teal-dark:#0A5D57;
+    --teal-soft:#E3F1EF;
+    --orange:#E8630A;
+    --orange-dark:#9A4206;
+    --orange-soft:#FDEBDC;
+    --violet:#6B4FBB;
+    --violet-dark:#4A3390;
+    --violet-soft:#ECE7F7;
+    --danger:#B4232A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  [hidden]{display:none !important;}
+  body{
+    font-family:'Noto Sans KR',sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+    line-height:1.6;
+    padding:20px 14px 60px;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+
+  header.app-head{
+    border:2px solid var(--teal);
+    border-radius:14px;
+    background:var(--card);
+    padding:22px 24px;
+    margin-bottom:18px;
+  }
+  header.app-head .headtop{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;
+  }
+  header.app-head h1{
+    font-size:1.45rem;font-weight:900;color:var(--teal-dark);
+    letter-spacing:-0.02em;
+  }
+  header.app-head p.sub{color:var(--muted);font-size:0.9rem;margin-top:4px;}
+  .credit{
+    text-align:right;font-size:0.8rem;color:var(--muted);line-height:1.5;white-space:nowrap;
+  }
+  .credit b{color:var(--muted);font-weight:700;font-size:0.9rem;}
+  .credit .claude{
+    display:block;margin-top:2px;font-size:0.72rem;color:var(--muted);font-weight:400;opacity:0.85;
+  }
+  @media(max-width:640px){ .credit{text-align:left;white-space:normal;} }
+
+  .keybox{
+    margin-top:16px;border:1px solid var(--line);border-radius:10px;
+    background:var(--cream);padding:14px 16px;
+  }
+  .keybox label{font-weight:700;font-size:0.9rem;display:block;margin-bottom:6px;}
+  .keyrow{display:flex;gap:8px;flex-wrap:wrap;}
+  .keyrow input{flex:1;min-width:220px;}
+  .keyhint{font-size:0.8rem;color:var(--muted);margin-top:8px;}
+  .keyhint a{color:var(--teal);font-weight:700;text-decoration:none;}
+  .keyhint a:hover{text-decoration:underline;}
+  .keystatus{font-size:0.8rem;font-weight:700;margin-top:6px;}
+  .keystatus.ok{color:var(--teal);}
+  .keystatus.no{color:var(--orange);}
+  .keystatus.temp{color:var(--muted);}
+  .modelinfo{font-size:0.75rem;color:var(--muted);margin-top:4px;}
+  .modelinfo code{font-family:Consolas,monospace;background:#fff;border:1px solid var(--line);border-radius:4px;padding:0 5px;}
+  .modelinfo select{
+    font-family:inherit;font-size:0.78rem;color:var(--ink);
+    border:1px solid var(--line);border-radius:6px;background:#fff;padding:3px 6px;
+  }
+  .btn.ghost.danger{border-color:var(--danger);color:var(--danger);}
+  .btn.ghost.danger:hover{background:#FBEDEE;}
+  .btn.api{
+    background:var(--orange);color:#fff;border:1px solid var(--orange);
+    display:inline-flex;align-items:center;gap:6px;text-decoration:none;
+  }
+  .btn.api:hover{background:#C95508;border-color:#C95508;}
+  .btn.small{padding:8px 14px;font-size:0.85rem;}
+
+  /* 좌우 플로팅 이동 버튼 */
+  .floatnav{
+    position:fixed;top:50%;transform:translateY(-50%);z-index:50;
+    width:52px;height:52px;border-radius:50%;
+    border:2px solid var(--teal);background:var(--card);color:var(--teal-dark);
+    font-size:1.3rem;font-weight:900;cursor:pointer;
+    box-shadow:0 4px 14px rgba(14,124,116,0.22);
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s, transform .15s, opacity .15s;
+  }
+  .floatnav:hover{background:var(--teal);color:#fff;transform:translateY(-50%) scale(1.06);}
+  .floatnav.prev{left:14px;}
+  .floatnav.next{right:14px;}
+  .floatnav:disabled{opacity:0.25;cursor:not-allowed;background:var(--card);color:var(--teal-dark);transform:translateY(-50%);}
+  .floatnav .lbl{
+    position:absolute;top:56px;left:50%;transform:translateX(-50%);
+    font-size:0.68rem;font-weight:700;color:var(--muted);white-space:nowrap;
+  }
+  @media(max-width:1000px){
+    .floatnav{top:auto;bottom:18px;transform:none;width:46px;height:46px;font-size:1.1rem;}
+    .floatnav:hover{transform:scale(1.06);}
+    .floatnav:disabled{transform:none;}
+    .floatnav .lbl{display:none;}
+  }
+
+  /* 단계 표시 */
+  .steps{
+    display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;
+  }
+  .steps button{
+    flex:1;min-width:100px;
+    border:1px solid var(--line);border-radius:10px;
+    background:var(--card);color:var(--muted);
+    padding:10px 6px;font-family:inherit;font-size:0.85rem;font-weight:700;
+    cursor:pointer;
+  }
+  .steps button .num{
+    display:inline-block;width:22px;height:22px;line-height:20px;
+    border:1px solid currentColor;border-radius:50%;
+    font-size:0.75rem;margin-right:6px;text-align:center;
+  }
+  .steps button.active{
+    border:2px solid var(--teal);color:var(--teal-dark);background:var(--teal-soft);
+  }
+  .steps button.done{color:var(--teal);}
+
+  /* 카드 공통 */
+  .panel{
+    border:1px solid var(--line);border-radius:14px;
+    background:var(--card);padding:22px 24px;margin-bottom:16px;
+  }
+  .panel h2{
+    font-size:1.1rem;font-weight:900;color:var(--teal-dark);
+    padding-bottom:10px;border-bottom:2px solid var(--teal);
+    margin-bottom:16px;
+  }
+  .panel h2 .tag{
+    display:inline-block;background:var(--orange);color:#fff;
+    font-size:0.7rem;font-weight:700;border-radius:6px;
+    padding:2px 8px;margin-left:8px;vertical-align:2px;
+  }
+  .panel p.desc{font-size:0.87rem;color:var(--muted);margin-bottom:12px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-weight:700;font-size:0.88rem;margin-bottom:6px;}
+  .field .hint{font-weight:400;color:var(--muted);font-size:0.78rem;margin-left:4px;}
+  input[type=text],input[type=password],input[type=number],textarea{
+    width:100%;border:1px solid var(--line);border-radius:8px;
+    padding:10px 12px;font-family:inherit;font-size:0.92rem;color:var(--ink);
+    background:#fff;
+  }
+  input:focus,textarea:focus{outline:2px solid var(--teal);outline-offset:0;border-color:var(--teal);}
+  textarea{resize:vertical;min-height:110px;}
+  textarea.result{min-height:170px;background:#FFFDF8;}
+  textarea.story{min-height:220px;background:#fff;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+  @media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+  .btn{
+    display:inline-block;border:none;border-radius:9px;
+    font-family:inherit;font-weight:700;font-size:0.95rem;
+    padding:12px 22px;cursor:pointer;
+  }
+  .btn.primary{background:var(--teal);color:#fff;}
+  .btn.primary:hover{background:var(--teal-dark);}
+  .btn.primary:disabled{background:#9DBBB8;cursor:not-allowed;}
+  .btn.ghost{
+    background:#fff;border:1px solid var(--teal);color:var(--teal-dark);
+  }
+  .btn.ghost:hover{background:var(--teal-soft);}
+  .btn.ghost:disabled{opacity:.6;cursor:not-allowed;}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;align-items:center;}
+  .btnrow .side{font-size:0.8rem;color:var(--muted);}
+
+  .error{
+    display:none;margin-top:12px;border:1px solid var(--danger);
+    border-radius:8px;background:#FBEDEE;color:var(--danger);
+    font-size:0.85rem;font-weight:500;padding:10px 14px;white-space:pre-wrap;
+  }
+  .error.show{display:block;}
+
+  .resulthead{
+    font-weight:900;font-size:0.9rem;color:var(--orange);
+    margin:20px 0 8px;padding-top:16px;border-top:1px dashed var(--line);
+  }
+  .resulthint{font-size:0.8rem;color:var(--muted);margin-bottom:8px;}
+
+  .notice{
+    border:1px solid var(--orange);border-radius:10px;
+    background:var(--orange-soft);padding:12px 14px;
+    font-size:0.85rem;margin:12px 0;
+  }
+  .notice b{color:var(--orange);}
+
+  /* 에셋 종류 범례 · 칩 · 하이라이트 */
+  .legend{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:0.8rem;color:var(--muted);margin:8px 0 4px;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px;}
+  .chip{
+    display:inline-flex;align-items:center;gap:5px;
+    border-radius:999px;padding:3px 11px;
+    font-size:0.78rem;font-weight:700;border:1px solid;
+    font-family:inherit;cursor:default;line-height:1.5;
+  }
+  .chip .k{font-weight:400;opacity:.8;font-size:0.7rem;}
+  .chip.char{background:var(--teal-soft);border-color:var(--teal);color:var(--teal-dark);}
+  .chip.scene{background:var(--orange-soft);border-color:var(--orange);color:var(--orange-dark);}
+  .chip.prop{background:var(--violet-soft);border-color:var(--violet);color:var(--violet-dark);}
+  .chip.missing{background:#FBEDEE;border-color:var(--danger);color:var(--danger);border-style:dashed;}
+  .chip.clickable{cursor:pointer;}
+  .chip.clickable:hover{filter:brightness(0.96);}
+  .chip.copied{background:var(--ink) !important;color:#fff !important;border-color:var(--ink) !important;}
+  .hl{padding:0 3px;border-radius:4px;font-weight:700;}
+  .hl.char{background:var(--teal-soft);color:var(--teal-dark);box-shadow:inset 0 -2px 0 var(--teal);}
+  .hl.scene{background:var(--orange-soft);color:var(--orange-dark);box-shadow:inset 0 -2px 0 var(--orange);}
+  .hl.prop{background:var(--violet-soft);color:var(--violet-dark);box-shadow:inset 0 -2px 0 var(--violet);}
+
+  /* 결과 카드 */
+  .cards{display:grid;gap:12px;margin-bottom:14px;}
+  .grouphead{
+    font-weight:900;font-size:0.88rem;margin-top:6px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .grouphead .cnt{font-weight:400;font-size:0.78rem;color:var(--muted);}
+  .grouphead.char{color:var(--teal-dark);}
+  .grouphead.scene{color:var(--orange-dark);}
+  .grouphead.prop{color:var(--violet-dark);}
+  .ccard{
+    border:1px solid var(--line);border-left:4px solid var(--teal);
+    border-radius:10px;background:#FFFDF8;padding:14px 16px;
+  }
+  .ccard .cname{font-weight:900;color:var(--teal-dark);font-size:0.95rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .ccard .crole{font-size:0.82rem;color:var(--muted);margin-bottom:8px;}
+  .ccard .cprompt{
+    font-size:0.86rem;white-space:pre-wrap;word-break:break-word;
+    border-top:1px dashed var(--line);padding-top:8px;line-height:1.75;
+  }
+  .ccard .copybtn{
+    margin-top:10px;border:1px solid var(--teal);border-radius:7px;
+    background:#fff;color:var(--teal-dark);font-family:inherit;
+    font-size:0.8rem;font-weight:700;padding:6px 14px;cursor:pointer;
+  }
+  .ccard .copybtn:hover{background:var(--teal-soft);}
+  .ccard .copybtn.copied{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .tbadge{
+    display:inline-block;font-size:0.68rem;font-weight:700;border-radius:5px;
+    padding:1px 7px;color:#fff;vertical-align:1px;
+  }
+  .ccard.char{border-left-color:var(--teal);}      .ccard.char .cname{color:var(--teal-dark);}   .ccard.char .tbadge{background:var(--teal);}
+  .ccard.scene{border-left-color:var(--orange);}   .ccard.scene .cname{color:var(--orange-dark);} .ccard.scene .tbadge{background:var(--orange);}
+  .ccard.prop{border-left-color:var(--violet);}    .ccard.prop .cname{color:var(--violet-dark);}  .ccard.prop .tbadge{background:var(--violet);}
+  .ccard.page{border-left-color:#8A857A;}          .ccard.page .cname{color:var(--ink);}
+  .ccard .sub{font-size:0.76rem;font-weight:700;color:var(--muted);margin-top:8px;}
+  .finaltag{
+    display:inline-block;margin-top:8px;background:var(--teal-soft);
+    border:1px solid var(--teal);border-radius:6px;color:var(--teal-dark);
+    font-size:0.78rem;font-weight:700;padding:3px 10px;
+  }
+  .refline{
+    margin-top:8px;font-size:0.78rem;color:var(--muted);
+    background:#fff;border:1px dashed var(--line);border-radius:6px;padding:6px 10px;
+  }
+
+  .nav{display:flex;justify-content:space-between;gap:10px;margin-top:4px;}
+  .savebar{
+    margin-top:20px;border:2px solid var(--orange);border-radius:14px;
+    background:var(--card);padding:18px 22px;text-align:center;
+  }
+  .savebar p{font-size:0.85rem;color:var(--muted);margin-bottom:10px;}
+  footer{
+    text-align:center;color:var(--muted);font-size:0.75rem;margin-top:26px;
+  }
+
+  /* 5·6단계: 쪽별 그림·음성 카드 */
+  .dropzone{
+    border:2px dashed var(--teal);border-radius:12px;background:var(--teal-soft);
+    padding:18px;text-align:center;margin:4px 0 14px;color:var(--teal-dark);font-size:0.88rem;
+  }
+  .dropzone.over{background:#CDE7E3;}
+  .dropzone .btnrow{justify-content:center;margin-top:10px;}
+  .mstat{font-size:0.85rem;font-weight:700;color:var(--teal-dark);margin:0 0 10px;}
+  .mstat.warn{color:var(--orange-dark);}
+  .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-bottom:14px;}
+  .mcard{
+    border:1px solid var(--line);border-radius:10px;background:#FFFDF8;padding:10px 12px;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .mcard.over{outline:3px solid var(--teal);}
+  .mcard .mhead{display:flex;justify-content:space-between;align-items:center;font-size:0.9rem;}
+  .mcard .mhead b{color:var(--ink);}
+  .mbadge{font-size:0.7rem;font-weight:700;border-radius:5px;padding:1px 7px;}
+  .mbadge.ok{background:var(--teal-soft);color:var(--teal-dark);}
+  .mbadge.no{background:var(--orange-soft);color:var(--orange-dark);}
+  .mthumb{
+    position:relative;width:100%;border-radius:8px;overflow:hidden;background:#F1EBDD;
+    border:1px solid var(--line);cursor:pointer;
+  }
+  .mthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+  .mthumb .empty{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;
+    color:var(--muted);font-size:0.8rem;line-height:1.5;
+  }
+  .mtext{font-size:0.78rem;color:var(--muted);line-height:1.55;max-height:4.7em;overflow:hidden;}
+  .mname{font-size:0.7rem;color:var(--muted);word-break:break-all;}
+  .mcrop{font-size:0.75rem;color:var(--muted);display:flex;align-items:center;gap:8px;}
+  .mcrop input{flex:1;}
+  .mbtns{display:flex;gap:4px;flex-wrap:wrap;}
+  .mbtns button{
+    border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);
+    font-family:inherit;font-size:0.75rem;font-weight:700;padding:4px 8px;cursor:pointer;
+  }
+  .mbtns button:hover{border-color:var(--teal);color:var(--teal-dark);}
+  .mbtns button.main{border-color:var(--teal);color:var(--teal-dark);flex:1;}
+  .mbtns button:disabled{opacity:.35;cursor:not-allowed;}
+  .mcard audio{width:100%;height:36px;}
+
+  /* 7단계: 오디오 플립북 */
+  .bookstage{
+    background:#3A332B;border-radius:12px;padding:22px 12px;display:flex;flex-direction:column;align-items:center;gap:14px;
+  }
+  .bookstage:fullscreen{border-radius:0;justify-content:center;padding:20px;}
+  #bookHost{margin:0 auto;}
+  .bpage{background:#FFFDF8;overflow:hidden;}
+  .bpage .fill{position:absolute;inset:0;}
+  .bpage img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;pointer-events:none;}
+  .bpage.noimg .fill{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1em;background:#F1EBDD;}
+  .bpage.text .fill{
+    display:flex;flex-direction:column;justify-content:center;
+    padding:12% 11%;background:#FFFDF8;color:var(--ink);
+    font-size:var(--bfont,18px);line-height:1.9;font-weight:500;word-break:keep-all;
+  }
+  .bpage.text .pno{position:absolute;bottom:5%;left:0;right:0;text-align:center;font-size:0.7em;color:var(--muted);}
+  .bpage.cover .fill,.bpage.back .fill{
+    background:var(--teal);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:12%;gap:0.8em;
+  }
+  .bpage.cover h3{font-size:calc(var(--bfont,18px) * 1.7);font-weight:900;line-height:1.35;word-break:keep-all;}
+  .bpage.cover p,.bpage.back p{font-size:calc(var(--bfont,18px) * 0.8);opacity:.85;}
+  .bpage.back h3{font-size:calc(var(--bfont,18px) * 1.6);font-weight:900;}
+  .bookctl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;}
+  .bookctl button{
+    border:1px solid #CFC5B0;border-radius:9px;background:#FBF6EC;color:var(--ink);
+    font-family:inherit;font-size:0.9rem;font-weight:700;padding:9px 14px;cursor:pointer;
+  }
+  .bookctl button:hover{background:#fff;}
+  .bookctl button.play{background:var(--orange);border-color:var(--orange);color:#fff;min-width:118px;}
+  .bookctl label{color:#F3EBDD;font-size:0.85rem;display:flex;align-items:center;gap:5px;cursor:pointer;}
+  .bookinfo{color:#F3EBDD;font-size:0.85rem;min-height:1.4em;text-align:center;}
+  @media(max-width:640px){
+    #panel7{padding:16px 10px;}
+    .bookstage{padding:14px 6px;}
+    .bookctl button{padding:8px 10px;font-size:0.85rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="app-head">
+    <div class="headtop">
+      <div>
+        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8 · 오디오 플립북</span></h1>
+        <p class="sub">줄거리(직접 작성) → 에셋(캐릭터·장면·도구) → 페이지 원고 → 장면 프롬프트 → 그림 올리기 → 음성 올리기 → 오디오 플립북, 7단계 도구</p>
+      </div>
+      <div class="credit">
+        made by <b>이경하</b>
+        <span class="claude">Claude 수정 · 2026.11.01</span>
+      </div>
+    </div>
+    <div class="keybox">
+      <label for="apiKey">내 Gemini API 키</label>
+      <div class="keyrow">
+        <input type="password" id="apiKey" placeholder="AIza... 로 시작하는 키를 붙여넣으세요" autocomplete="off">
+        <button class="btn ghost" id="btnKeySave" type="button">키 저장</button>
+        <button class="btn ghost danger" id="btnKeyClear" type="button" hidden title="이 브라우저에 저장된 API 키를 삭제하고 입력칸을 비웁니다">저장 삭제</button>
+        <a class="btn api" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" title="Google AI Studio API 키 대시보드 열기">API 키 발급 ↗</a>
+      </div>
+      <div class="keystatus no" id="keyStatus">키가 아직 저장되지 않았습니다.</div>
+      <div class="modelinfo">
+        모델:
+        <select id="modelPref" title="자동이면 과부하·한도 초과·모델 없음·시간 초과일 때 다음 후보로 넘어갑니다">
+          <option value="auto">자동 · 품질 우선 (유료 키)</option>
+          <option value="free">자동 · 무료 키 우선 (Lite부터)</option>
+          <option value="gemini-3.8-flash">gemini-3.8-flash 고정</option>
+          <option value="gemini-3.6-flash">gemini-3.6-flash 고정</option>
+          <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite 고정</option>
+          <option value="gemini-2.5-flash">gemini-2.5-flash 고정</option>
+          <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite 고정</option>
+        </select>
+        · 마지막 응답: <code id="modelName">아직 없음</code>
+        <div id="modelNote" style="margin-top:3px;"></div>
+      </div>
+      <div class="keyhint">키가 없다면 오른쪽 <b>API 키 발급</b> 버튼을 눌러 Google AI Studio에서 무료로 발급할 수 있습니다. [키 저장]을 누르면 이 브라우저에 저장할지 물어보며, 저장하지 않으면 이 화면을 닫을 때 키가 사라집니다.</div>
+    </div>
+  </header>
+
+  <div class="steps" id="stepNav">
+    <button data-step="1" type="button"><span class="num">1</span>줄거리</button>
+    <button data-step="2" type="button"><span class="num">2</span>에셋</button>
+    <button data-step="3" type="button"><span class="num">3</span>페이지 원고</button>
+    <button data-step="4" type="button"><span class="num">4</span>장면 프롬프트</button>
+    <button data-step="5" type="button"><span class="num">5</span>그림 올리기</button>
+    <button data-step="6" type="button"><span class="num">6</span>음성 올리기</button>
+    <button data-step="7" type="button"><span class="num">7</span>오디오 플립북</button>
+  </div>
+
+  <!-- 1단계 -->
+  <section class="panel" id="panel1">
+    <h2>1단계. 줄거리 쓰기</h2>
+    <p class="desc">줄거리는 <b>직접 작성</b>합니다. 아래 칸에 이야기를 쓰거나 붙여넣고, <b>책 분량(페이지 수·페이지당 문장 수)</b>을 정하세요. 분량은 2단계에서 장면(배경)을 몇 개 뽑을지, 3단계에서 원고를 어떻게 나눌지의 기준이 됩니다. 컨셉트·대상·주제는 선택 항목입니다.</p>
+    <div class="grid3">
+      <div class="field">
+        <label for="s1concept">컨셉트 <span class="hint">선택</span></label>
+        <input type="text" id="s1concept" placeholder="예: 글자를 배우는 아이와 도서관 유령의 우정">
+      </div>
+      <div class="field">
+        <label for="s1target">대상 <span class="hint">연령·독자, 선택</span></label>
+        <input type="text" id="s1target" placeholder="예: 8세 어린이">
+      </div>
+      <div class="field">
+        <label for="s1theme">주제 <span class="hint">선택</span></label>
+        <input type="text" id="s1theme" placeholder="예: 배움의 즐거움과 우정">
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label for="s3pages">원고 총 개수 <span class="hint">페이지 수 · 2단계 장면 개수와 3단계 원고 분량의 기준</span></label>
+        <input type="number" id="s3pages" min="1" placeholder="예: 25">
+      </div>
+      <div class="field">
+        <label for="s3sent">페이지당 문장 수</label>
+        <input type="number" id="s3sent" min="1" placeholder="예: 2">
+      </div>
+    </div>
+    <div class="field">
+      <label for="s1result">줄거리 <span class="hint">직접 작성 · 기승전결이 보이게 500자 안팎 권장</span></label>
+      <textarea class="story" id="s1result" placeholder="여기에 줄거리를 직접 쓰세요.&#10;예) 글자를 모르는 아이 민호는 밤마다 도서관에 몰래 들어가 책 그림만 본다. 어느 날 책 사이에서 나온 유령 '책벌레'가 ..."></textarea>
+    </div>
+    <div class="btnrow">
+      <button class="btn ghost" id="btnGen1" type="button" title="컨셉트·대상·주제를 바탕으로 AI가 초안을 써 줍니다. 쓴 뒤 자유롭게 고치세요.">AI로 초안 받기 (선택)</button>
+      <span class="side">초안을 받은 뒤에도 자유롭게 고칠 수 있습니다.</span>
+    </div>
+    <div class="error" id="err1"></div>
+    <div class="nav"><span></span><button class="btn ghost" data-go="2" type="button">다음 단계</button></div>
+  </section>
+
+  <!-- 2단계 -->
+  <section class="panel" id="panel2" hidden>
+    <h2>2단계. 에셋 참조 프롬프트 만들기 <span class="tag">핵심</span></h2>
+    <p class="desc">
+      동화책 그림에 반복해서 쓰일 <b>에셋</b> 세 종류의 참조 이미지 프롬프트를 만듭니다.
+      <span class="hl char">캐릭터</span>는 여러 번 등장하는 주요 캐릭터만(일관성 유지),
+      <span class="hl scene">장면</span>은 이야기에 필요한 배경을 개수 제한 없이 모두,
+      <span class="hl prop">도구</span>는 중요한 물건·소품을 뽑습니다.
+    </p>
+    <div class="grid3">
+      <div class="field">
+        <label for="s2style">원하는 이미지 스타일</label>
+        <input type="text" id="s2style" placeholder="예: felt doll style, soft wool texture">
+      </div>
+      <div class="field">
+        <label for="s2w">이미지 가로 <span class="hint">mm</span></label>
+        <input type="number" id="s2w" min="1" placeholder="예: 210">
+      </div>
+      <div class="field">
+        <label for="s2h">이미지 세로 <span class="hint">mm</span></label>
+        <input type="number" id="s2h" min="1" placeholder="예: 210">
+      </div>
+    </div>
+    <div class="field">
+      <label for="s2faces">캐릭터 시트 표정 <span class="hint">쉼표로 구분 · 비우면 기본값 사용 · 캐릭터는 앞·옆·뒤 전신 + 이 표정들이 한 장에 담긴 시트로 생성됩니다</span></label>
+      <input type="text" id="s2faces" placeholder="기본값: 기쁨, 슬픔, 놀람, 화남">
+    </div>
+    <div class="btnrow">
+      <button class="btn primary" id="btnGen2" type="button">에셋 생성</button>
+    </div>
+    <div class="error" id="err2"></div>
+    <div class="notice"><b>사용 팁</b> 각 에셋 프롬프트로 참조 이미지를 1장씩 먼저 만들어 두세요. 캐릭터는 <b>앞·옆·뒤 전신과 표정 여러 개가 한 장에 담긴 캐릭터 시트</b>로 나오므로, 장면에서 뒷모습이나 다른 표정이 필요할 때도 같은 시트 한 장을 첨부하면 됩니다. 4단계 장면 프롬프트를 쓸 때 그 페이지에 쓰이는 캐릭터·장면·도구 참조 이미지를 함께 첨부하면, 캐릭터뿐 아니라 배경과 물건의 일관성도 유지됩니다.</div>
+    <div class="resulthead">에셋 카드</div>
+    <div class="legend">종류별 색:
+      <span class="chip char">캐릭터</span><span class="chip scene">장면</span><span class="chip prop">도구</span>
+    </div>
+    <div class="cards" id="cards2"></div>
+    <div class="resulthint">아래 원본 표를 직접 고치면 카드도 함께 바뀌고, 다음 단계에도 고친 내용이 사용됩니다. (열 순서: 종류 | 에셋 이름 | 설명 | 참조 이미지 프롬프트)</div>
+    <textarea class="result" id="s2result" placeholder="[에셋 생성] 버튼을 누르면 여기에 결과 표가 채워집니다."></textarea>
+    <div class="nav">
+      <button class="btn ghost" data-go="1" type="button">이전 단계</button>
+      <button class="btn ghost" data-go="3" type="button">다음 단계</button>
+    </div>
+  </section>
+
+  <!-- 3단계 -->
+  <section class="panel" id="panel3" hidden>
+    <h2>3단계. 페이지별 원고 만들기</h2>
+    <p class="desc" id="s3summary">1단계에서 정한 분량으로 씁니다.</p>
+    <div class="btnrow">
+      <button class="btn primary" id="btnGen3" type="button">원고 생성</button>
+      <button class="btn ghost small" data-go="1" type="button">분량 바꾸기 (1단계)</button>
+    </div>
+    <div class="error" id="err3"></div>
+    <div class="resulthead">페이지별 원고 카드</div>
+    <div class="cards" id="cards3"></div>
+    <div class="resulthint">아래 원본 표를 직접 고치면 카드도 함께 바뀌고, 다음 단계에도 고친 내용이 사용됩니다.</div>
+    <textarea class="result" id="s3result" placeholder="[원고 생성] 버튼을 누르면 여기에 결과 표가 채워집니다."></textarea>
+    <div class="nav">
+      <button class="btn ghost" data-go="2" type="button">이전 단계</button>
+      <button class="btn ghost" data-go="4" type="button">다음 단계</button>
+    </div>
+  </section>
+
+  <!-- 4단계 -->
+  <section class="panel" id="panel4" hidden>
+    <h2>4단계. 장면 프롬프트와 사용 에셋</h2>
+    <p class="desc">
+      2단계 에셋 표와 3단계 원고를 자동으로 사용합니다. 페이지마다 <b>전체 장면 프롬프트</b>와 그 그림에 들어가는
+      <span class="hl char">캐릭터</span>·<span class="hl scene">장면</span>·<span class="hl prop">도구</span> 에셋을 색으로 표시합니다.
+      이미지 생성 AI에 프롬프트를 넣을 때 표시된 에셋의 참조 이미지를 함께 첨부하세요.
+    </p>
+    <div class="btnrow">
+      <button class="btn primary" id="btnGen4" type="button">장면 생성</button>
+    </div>
+    <div class="error" id="err4"></div>
+    <div class="resulthead">장면별 최종 이미지 프롬프트 카드</div>
+    <div class="legend">칩을 누르면 그 에셋의 참조 프롬프트가 복사됩니다 ·
+      <span class="chip char">캐릭터</span><span class="chip scene">장면</span><span class="chip prop">도구</span>
+      <span class="chip missing">2단계 표에 없음</span>
+    </div>
+    <div class="cards" id="cards4"></div>
+    <div class="resulthint">아래 원본 표를 직접 고치면 카드도 함께 바뀝니다. 카드의 복사 버튼을 누르면 장면 프롬프트 + 첨부할 참조 이미지 안내 + 화풍·크기 태그가 함께 복사됩니다. (열 순서: 페이지 | 사용 에셋 | 장면 프롬프트)</div>
+    <textarea class="result" id="s4result" placeholder="[장면 생성] 버튼을 누르면 여기에 결과 표가 채워집니다."></textarea>
+    <div class="nav">
+      <button class="btn ghost" data-go="3" type="button">이전 단계</button>
+      <button class="btn ghost" data-go="5" type="button">다음 단계</button>
+    </div>
+  </section>
+
+  <!-- 5단계 -->
+  <section class="panel" id="panel5" hidden>
+    <h2>5단계. 페이지별 그림 올리기</h2>
+    <p class="desc">
+      4단계 프롬프트로 이미지 생성 AI(ChatGPT 등)에서 만든 그림을 쪽마다 올립니다. 쪽 수와 원고는 1·3단계 내용을 그대로 씁니다.
+      그림 비율이 2단계 책 크기와 다르면 책 크기에 맞게 잘라서 보여 주며, 자를 위치는 카드의 막대로 옮길 수 있습니다. (원본 파일은 바뀌지 않습니다)
+    </p>
+    <div class="dropzone" id="drop5">
+      그림 파일을 여기에 한꺼번에 끌어다 놓거나 아래 버튼으로 고르세요.<br>
+      파일 이름에 쪽 번호(1, 2, 3…)가 있으면 그 번호의 쪽에, 없으면 파일을 받은(저장한) 시각 순서대로 1쪽부터 넣습니다.
+      <div class="btnrow">
+        <button class="btn primary small" id="btnImgMany" type="button">그림 여러 장 고르기</button>
+        <button class="btn ghost small danger" id="btnImgClear" type="button">그림 모두 빼기</button>
+      </div>
+      <input type="file" id="imgMany" accept="image/*" multiple hidden>
+      <input type="file" id="imgOne" accept="image/*" hidden>
+    </div>
+    <div class="mstat" id="stat5"></div>
+    <div class="mgrid" id="grid5"></div>
+    <div class="error" id="err5"></div>
+    <div class="nav">
+      <button class="btn ghost" data-go="4" type="button">이전 단계</button>
+      <button class="btn ghost" data-go="6" type="button">다음 단계</button>
+    </div>
+  </section>
+
+  <!-- 6단계 -->
+  <section class="panel" id="panel6" hidden>
+    <h2>6단계. 페이지별 음성 올리기</h2>
+    <p class="desc">
+      일레븐랩스 등에서 쪽마다 만든 낭독 음성 파일(MP3·WAV·M4A 등)을 올립니다. 플립북에서 그 쪽을 펼치면 이 음성이 나옵니다.
+    </p>
+    <div class="dropzone" id="drop6">
+      음성 파일을 여기에 한꺼번에 끌어다 놓거나 아래 버튼으로 고르세요.<br>
+      파일 이름에 쪽 번호(1p, p02, 3쪽…)가 있으면 그 번호의 쪽에, 없으면 파일을 받은(저장한) 시각 순서대로 1쪽부터 넣습니다.
+      <div class="btnrow">
+        <button class="btn primary small" id="btnAudMany" type="button">음성 여러 개 고르기</button>
+        <button class="btn ghost small danger" id="btnAudClear" type="button">음성 모두 빼기</button>
+      </div>
+      <input type="file" id="audMany" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg" multiple hidden>
+      <input type="file" id="audOne" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg" hidden>
+    </div>
+    <div class="mstat" id="stat6"></div>
+    <div class="mgrid" id="grid6"></div>
+    <div class="error" id="err6"></div>
+    <div class="nav">
+      <button class="btn ghost" data-go="5" type="button">이전 단계</button>
+      <button class="btn ghost" data-go="7" type="button">다음 단계</button>
+    </div>
+  </section>
+
+  <!-- 7단계 -->
+  <section class="panel" id="panel7" hidden>
+    <h2>7단계. 오디오 플립북</h2>
+    <p class="desc">
+      왼쪽에 그림, 오른쪽에 원고가 펼쳐지고, 책장을 넘기면 그 쪽의 음성이 나옵니다. 화면이 좁으면 한 쪽씩 보여 줍니다.
+      책장 모서리를 끌거나 누르고, 아래 버튼이나 키보드 ← → 로도 넘길 수 있습니다.
+    </p>
+    <div class="bookstage" id="bookStage">
+      <div id="bookHost"></div>
+      <div class="bookinfo" id="bookInfo"></div>
+      <div class="bookctl">
+        <button type="button" id="bkFirst" title="표지로 돌아가기">⏮ 처음으로</button>
+        <button type="button" id="bkPrev">◀ 이전</button>
+        <button type="button" class="play" id="bkPlay">▶ 소리 듣기</button>
+        <button type="button" id="bkReplay" title="지금 쪽의 음성을 처음부터 다시 듣기">↺ 다시 듣기</button>
+        <button type="button" id="bkNext">다음 ▶</button>
+        <label><input type="checkbox" id="bkAuto"> 자동 넘김</label>
+        <button type="button" id="bkFull">전체 화면</button>
+      </div>
+    </div>
+    <div class="error" id="err7"></div>
+    <div class="nav" style="margin-top:14px;">
+      <button class="btn ghost" data-go="6" type="button">이전 단계</button>
+      <span></span>
+    </div>
+  </section>
+
+  <div class="savebar" style="border-color:var(--teal);">
+    <p>1~4단계의 입력과 결과를 JSON 파일로 저장해 두면, 다른 컴퓨터나 브라우저에서 불러와 이어서 작업할 수 있습니다. (API 키는 저장되지 않습니다)<br>
+    5·6단계에서 올린 그림과 음성은 JSON에 들어가지 않고 이 브라우저에만 보관됩니다. 다른 컴퓨터에서는 다시 올려 주세요.</p>
+    <div class="btnrow" style="justify-content:center;">
+      <button class="btn primary" id="btnJsonSave" type="button">작업 내용 JSON으로 저장</button>
+      <button class="btn ghost" id="btnJsonLoad" type="button">JSON 파일 불러오기</button>
+      <input type="file" id="jsonFile" accept=".json,application/json" hidden>
+    </div>
+    <div class="error" id="errJson"></div>
+  </div>
+
+  <footer>모든 입력과 결과, 올린 그림과 음성은 이 컴퓨터의 브라우저에 자동 저장되어, 새로고침해도 유지됩니다. 그림과 음성은 서버로 보내지 않습니다.</footer>
+</div>
+
+<button class="floatnav prev" id="floatPrev" type="button" title="이전 단계" aria-label="이전 단계">◀<span class="lbl">이전</span></button>
+<button class="floatnav next" id="floatNext" type="button" title="다음 단계" aria-label="다음 단계">▶<span class="lbl">다음</span></button>
+
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+<script>
+"use strict";
+
+/* ---------- 상태 저장 ---------- */
+var LS_KEY = "storybookAssetPromptApp_v1";          /* V7부터 별도 저장 공간 (예전 앱과 섞이지 않게) */
+var LS_API_KEY = "storybookPromptApp_apiKey";        /* API 키는 예전 앱과 공유 (사용자 동의 시에만 저장) */
+var APP_VERSION = "V8 오디오 플립북 · Claude 수정 2026.11.01";
+var LAST_STEP = 7;
+/* 모델 후보: 앞에서부터 시도, 실패하면 다음으로
+   - 품질 우선: 최신 Flash → 이전 Flash → Flash-Lite
+   - 무료 키 우선: 한도가 넉넉한 편인 Flash-Lite부터 (무료 등급은 3.8 Flash 한도가 매우 작음) */
+var MODELS = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash", "gemini-2.5-flash-lite"];
+var MODELS_FREE = ["gemini-3.5-flash-lite", "gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-3.6-flash", "gemini-3.8-flash"];
+var fieldIds = ["s1concept","s1target","s1theme","s1result",
+                "s2style","s2w","s2h","s2faces","s2result",
+                "s3pages","s3sent","s3result","s4result"];
+var state = { step: 1 };
+var keyPersisted = false;
+
+function loadState(){
+  try{
+    var raw = localStorage.getItem(LS_KEY);
+    if(raw){ state = JSON.parse(raw) || { step:1 }; }
+  }catch(e){ state = { step:1 }; }
+  if(!state.step) state.step = 1;
+  fieldIds.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && state[id] !== undefined && state[id] !== null){ el.value = state[id]; }
+  });
+  if(state.modelPref && (state.modelPref === "auto" || state.modelPref === "free" || MODELS.indexOf(state.modelPref) !== -1)){
+    document.getElementById("modelPref").value = state.modelPref;
+  }
+  document.getElementById("modelNote").textContent = describeOrder();
+  try{
+    var savedKey = localStorage.getItem(LS_API_KEY);
+    if(savedKey){ document.getElementById("apiKey").value = savedKey; keyPersisted = true; }
+  }catch(e){}
+}
+function saveState(){
+  fieldIds.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el){ state[id] = el.value; }
+  });
+  state.modelPref = modelPref();
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+}
+
+/* ---------- 단계 이동 ---------- */
+function showStep(n){
+  if(state.step === 7 && n !== 7) stopBookAudio();
+  state.step = n;
+  for(var i=1;i<=LAST_STEP;i++){
+    document.getElementById("panel"+i).hidden = (i !== n);
+  }
+  var btns = document.querySelectorAll("#stepNav button");
+  btns.forEach(function(b){
+    var s = parseInt(b.getAttribute("data-step"),10);
+    b.classList.toggle("active", s === n);
+    var resultEl = document.getElementById("s"+s+"result");
+    b.classList.toggle("done", !!(resultEl && resultEl.value.trim()) && s !== n);
+  });
+  saveState();
+  updateFloatNav();
+  window.scrollTo({top:0, behavior:"smooth"});
+  if(n === 5) renderGrid5();
+  if(n === 6) renderGrid6();
+  if(n === 7) ensureBook();
+}
+function updateFloatNav(){
+  document.getElementById("floatPrev").disabled = (state.step <= 1);
+  document.getElementById("floatNext").disabled = (state.step >= LAST_STEP);
+}
+
+/* ---------- 공통: 오류 표시 ---------- */
+function showError(n, msg){
+  var el = document.getElementById("err"+n);
+  el.textContent = msg;
+  el.classList.add("show");
+}
+function clearError(n){
+  var el = document.getElementById("err"+n);
+  el.textContent = "";
+  el.classList.remove("show");
+}
+
+/* ---------- Gemini 호출 (스트리밍) ---------- */
+var FIRST_BYTE_TIMEOUT_MS = 45000;   /* 첫 응답이 이 시간 안에 안 오면 → 다음 모델 */
+var STALL_TIMEOUT_MS = 60000;        /* 스트리밍 도중 이 시간 동안 데이터가 없으면 → 다음 모델 */
+var genInfo = { model: "", chars: 0 };   /* 버튼에 표시할 진행 정보 */
+
+/* SSE 한 줄(data: {...})에서 본문 텍스트를 꺼내 누적. 오류 객체면 메시지를 돌려줌 */
+function sseLine(line, acc){
+  if(line.indexOf("data:") !== 0) return null;
+  var js = line.slice(5).trim();
+  if(!js) return null;
+  var obj;
+  try{ obj = JSON.parse(js); }catch(e){ return null; }
+  if(obj.error){ return obj.error.message || "stream error"; }
+  try{
+    var parts = obj.candidates[0].content.parts || [];
+    parts.forEach(function(p){ if(!p.thought && p.text){ acc.text += p.text; } });
+    if(obj.candidates[0].finishReason) acc.finish = obj.candidates[0].finishReason;
+  }catch(e){}
+  return null;
+}
+function geminiRequest(model, prompt, useThinking, onText){
+  var key = document.getElementById("apiKey").value.trim();
+  var url = "https://generativelanguage.googleapis.com/v1beta/models/" + model + ":streamGenerateContent?alt=sse&key=" + encodeURIComponent(key);
+  var gen = { temperature: 0.7, maxOutputTokens: 32768 };
+  /* 3.x 모델은 thinkingLevel 사용 (3.8은 minimal 미지원 → low). 지원 안 하는 모델이면 400이 오므로 빼고 재시도 */
+  if(useThinking) gen.thinkingConfig = { thinkingLevel: "low" };
+  var body = { contents: [{ role:"user", parts:[{ text: prompt }] }], generationConfig: gen };
+
+  var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+  var timer = null, timedOut = false, firstByte = false;
+  function arm(ms){ if(!ctrl) return; clearTimeout(timer); timer = setTimeout(function(){ timedOut = true; ctrl.abort(); }, ms); }
+  arm(FIRST_BYTE_TIMEOUT_MS);
+
+  return fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal: ctrl ? ctrl.signal : undefined
+  }).then(function(res){
+    if(!res.ok){
+      clearTimeout(timer);
+      return res.json().catch(function(){ return {}; }).then(function(data){
+        return { ok:false, status:res.status, data:data };
+      });
+    }
+    var acc = { text: "", finish: "" };
+    var errMsg = null;
+    if(!res.body || !res.body.getReader){
+      /* 스트리밍을 못 읽는 브라우저: 끝까지 받은 뒤 한꺼번에 처리 */
+      return res.text().then(function(t){
+        clearTimeout(timer);
+        t.split(/\r?\n/).forEach(function(l){ var e = sseLine(l, acc); if(e) errMsg = e; });
+        return errMsg ? { ok:false, status:500, data:{error:{message:errMsg}} }
+                      : { ok:true, status:200, text:acc.text, finish:acc.finish };
+      });
+    }
+    var reader = res.body.getReader();
+    var dec = new TextDecoder("utf-8");
+    var buf = "";
+    function pump(){
+      return reader.read().then(function(r){
+        if(r.done){
+          clearTimeout(timer);
+          if(buf.trim()){ var e2 = sseLine(buf.trim(), acc); if(e2) errMsg = e2; }
+          return errMsg ? { ok:false, status:500, data:{error:{message:errMsg}} }
+                        : { ok:true, status:200, text:acc.text, finish:acc.finish };
+        }
+        firstByte = true;
+        arm(STALL_TIMEOUT_MS);
+        buf += dec.decode(r.value, { stream:true });
+        var lines = buf.split(/\r?\n/);
+        buf = lines.pop();
+        lines.forEach(function(l){ var e = sseLine(l, acc); if(e) errMsg = e; });
+        genInfo.chars = acc.text.length;
+        if(onText) onText(acc.text);
+        return pump();
+      });
+    }
+    return pump();
+  }).catch(function(err){
+    clearTimeout(timer);
+    if(timedOut || (err && err.name === "AbortError")){
+      var why = firstByte
+        ? "응답이 중간에 멈춤 (" + (STALL_TIMEOUT_MS/1000) + "초 동안 데이터 없음)"
+        : "응답 대기 시간 초과 (" + (FIRST_BYTE_TIMEOUT_MS/1000) + "초 안에 첫 응답 없음 — 과부하로 추정)";
+      return { ok:false, status:0, timeout:true, data:{ error:{ message: why } } };
+    }
+    throw err;
+  });
+}
+/* 이번 화면에서 마지막으로 성공한 모델. 자동 모드는 여기서부터 시도해 과부하 모델을 매번 다시 두드리지 않음 */
+var lastGoodModel = null;
+function modelPref(){
+  var sel = document.getElementById("modelPref");
+  return sel ? sel.value : "auto";
+}
+function candidateModels(){
+  var pref = modelPref();
+  var list = (pref === "auto") ? MODELS : (pref === "free") ? MODELS_FREE : null;
+  if(!list) return [pref];                                 /* 고정 선택: 그 모델만 */
+  var i = Math.max(0, list.indexOf(lastGoodModel));
+  return list.slice(i).concat(list.slice(0, i));           /* 마지막 성공 모델부터, 끝나면 앞으로 돌아감 */
+}
+function describeOrder(){
+  var pref = modelPref();
+  if(pref === "auto") return "순서: " + MODELS.join(" → ");
+  if(pref === "free") return "순서: " + MODELS_FREE.join(" → ");
+  return "이 모델만 사용 (실패해도 전환 안 함)";
+}
+/* 다음 후보로 넘어가야 하는 실패인지: 모델 없음·지원 종료·과부하·한도 초과·시간 초과 */
+function shouldFallback(status, msg){
+  if(status === 0 || status === 404 || status === 429 || status === 503) return true;
+  return /not found|not supported|no longer available|deprecated|high demand|overloaded|unavailable|resource.?exhausted|quota|rate.?limit/i.test(msg);
+}
+function callGemini(prompt, onText){
+  var key = document.getElementById("apiKey").value.trim();
+  if(!key){
+    return Promise.reject(new Error("먼저 Gemini API 키를 입력하세요. (화면 맨 위 입력칸)"));
+  }
+  var models = candidateModels();
+  var failures = [];
+  function attempt(idx, useThinking){
+    var model = models[idx];
+    genInfo.model = model; genInfo.chars = 0;
+    return geminiRequest(model, prompt, useThinking, onText).then(function(r){
+      var data = r.data;
+      if(!r.ok){
+        var m = (data && data.error && data.error.message) ? data.error.message : ("HTTP " + r.status);
+        /* thinkingConfig를 못 받는 모델 → 빼고 같은 모델로 재시도 */
+        if(r.status === 400 && useThinking && /thinking/i.test(m)){
+          return attempt(idx, false);
+        }
+        if(r.status === 400 && /API key/i.test(m)){
+          throw new Error("API 키가 올바르지 않습니다. 키를 다시 확인해 주세요.\n(원문: " + m + ")");
+        }
+        if(shouldFallback(r.status, m)){
+          failures.push(model + " → " + (r.status ? "HTTP " + r.status + " " : "") + m.split(/\.\s|\n/)[0]);
+          if(idx + 1 < models.length){
+            document.getElementById("modelNote").textContent = "(" + model + " 실패 → " + models[idx+1] + " 시도 중)";
+            return attempt(idx + 1, true);
+          }
+          var head = (models.length === 1)
+            ? "선택한 모델 " + model + " 호출에 실패했습니다. 잠시 후 다시 시도하거나, 위 모델 선택을 '자동'으로 바꿔 보세요."
+            : "후보 모델을 모두 시도했지만 실패했습니다. 무료 키라면 '자동 · 무료 키 우선'으로 바꾸거나, 하루 한도가 초기화되는 한국 시간 오후 4~5시(태평양 자정) 이후 다시 시도해 보세요.";
+          throw new Error(head + "\n" + failures.join("\n"));
+        }
+        throw new Error("Gemini 호출에 실패했습니다. (모델: " + model + ")\n(원문: " + m + ")");
+      }
+      var text = r.text || "";
+      if(!text.trim()){
+        var reason = r.finish || "";
+        throw new Error("Gemini가 빈 응답을 보냈습니다. 다시 한 번 시도해 주세요. (모델: " + model + (reason ? ", finishReason: " + reason : "") + ")");
+      }
+      if(r.finish === "MAX_TOKENS"){
+        text += "\n\n(※ 출력 한도에 걸려 끝이 잘렸습니다. 페이지 수를 줄이거나 나눠서 생성하세요.)";
+      }
+      lastGoodModel = model;
+      document.getElementById("modelName").textContent = model;
+      document.getElementById("modelNote").textContent = failures.length
+        ? "(" + failures.map(function(f){ return f.split(" → ")[0]; }).join(", ") + " 실패 → " + model + "로 자동 전환됨)"
+        : "(정상 응답 · " + describeOrder() + ")";
+      return text.trim();
+    });
+  }
+  return attempt(0, true).catch(function(err){
+    if(err instanceof TypeError){
+      throw new Error("네트워크 연결에 실패했습니다. 인터넷 연결을 확인해 주세요.");
+    }
+    throw err;
+  });
+}
+
+/* 버튼 로딩 상태: 경과 시간 · 시도 중인 모델 · 받은 글자 수를 1초마다 표시 */
+function withLoading(btn, originalLabel, fn){
+  btn.disabled = true;
+  var started = Date.now();
+  genInfo.model = ""; genInfo.chars = 0;
+  function tick(){
+    var s = Math.floor((Date.now() - started) / 1000);
+    btn.textContent = "생성 중… " + s + "초" + (genInfo.model ? " · " + genInfo.model : "") + (genInfo.chars ? " · " + genInfo.chars + "자" : "");
+  }
+  tick();
+  var iv = setInterval(tick, 1000);
+  function done(){ clearInterval(iv); btn.disabled = false; btn.textContent = originalLabel; }
+  return fn().then(function(v){ done(); return v; }, function(err){ done(); throw err; });
+}
+
+/* ---------- 관대한 표 파싱 ---------- */
+function stripMd(s){
+  return s.replace(/\*\*/g,"").replace(/^`+|`+$/g,"").trim();
+}
+function parseTableRows(text){
+  var rows = [];
+  var lines = text.split(/\r?\n/);
+  lines.forEach(function(line){
+    var t = line.trim();
+    if(!t) return;
+    var cells = null;
+    if(t.indexOf("|") !== -1){
+      cells = t.split("|").map(function(c){ return c.trim(); });
+      if(cells.length && cells[0] === "") cells.shift();
+      if(cells.length && cells[cells.length-1] === "") cells.pop();
+      if(!cells.length) return;
+      var isSep = cells.every(function(c){ return /^:?-{2,}:?$/.test(c); });
+      if(isSep) return;
+    } else if(t.indexOf("\t") !== -1){
+      cells = t.split("\t").map(function(c){ return c.trim(); });
+    } else {
+      return;
+    }
+    rows.push(cells.map(stripMd));
+  });
+  return rows;
+}
+function looksLikeHeader(cells){
+  var joined = cells.join(" ");
+  /* V8: 칸 하나하나도 검사 ('| 페이지 | 원고 |' 머리글이 1쪽 원고로 읽히던 문제) */
+  var cellHit = cells.some(function(c){ return /^(종류|페이지|원고|사용\s*에셋|장면\s*프롬프트)$/.test(c); });
+  return (cellHit || /^종류$|에셋\s*이름|사용\s*에셋|캐릭터\s*이름|역할\s*한\s*줄|참조\s*이미지|장면\s*프롬프트|장면\s*묘사|장면묘사|^페이지$|^원고$/.test(joined)) &&
+         cells.every(function(c){ return c.length < 25; });
+}
+function dropHeader(rows){
+  if(rows.length && looksLikeHeader(rows[0])) return rows.slice(1);
+  return rows;
+}
+
+/* ---------- 에셋 종류 ---------- */
+var TYPE_LABEL = { char: "캐릭터", scene: "장면", prop: "도구" };
+var TYPE_ORDER = ["char", "scene", "prop"];
+function typeFromWord(w){
+  w = (w || "").replace(/[\s()\[\]]/g, "");
+  if(/^(캐릭터|인물|등장인물|character|characters)$/i.test(w)) return "char";
+  if(/^(장면|배경|장소|scene|scenes|background|backgrounds|location)$/i.test(w)) return "scene";
+  if(/^(도구|소품|물건|사물|prop|props|item|items|object|objects)$/i.test(w)) return "prop";
+  return null;
+}
+/* 2단계 표 한 줄 → {type,name,desc,prompt}. 예전 3열 표(이름|역할|프롬프트)도 캐릭터로 읽음 */
+function parseAssetRow(cells){
+  if(cells.length < 2) return null;
+  var t0 = typeFromWord(cells[0]);
+  var a;
+  if(t0 && cells.length >= 4){
+    a = { type: t0, name: cells[1], desc: cells[2], prompt: cells.slice(3).join(" | ") };
+  } else if(t0 && cells.length === 3){
+    a = { type: t0, name: cells[1], desc: "", prompt: cells[2] };
+  } else if(cells.length >= 3){
+    a = { type: "char", name: cells[0], desc: cells[1], prompt: cells.slice(2).join(" | ") };
+  } else {
+    a = { type: "char", name: cells[0], desc: "", prompt: cells[1] };
+  }
+  a.name = a.name.trim();
+  if(!a.name || !a.prompt) return null;
+  return a;
+}
+function assetList(){
+  var rows = dropHeader(parseTableRows(document.getElementById("s2result").value));
+  var list = [];
+  rows.forEach(function(cells){ var a = parseAssetRow(cells); if(a) list.push(a); });
+  return list;
+}
+function findAsset(list, name){
+  var n = name.trim();
+  for(var i=0;i<list.length;i++){ if(list[i].name === n) return list[i]; }
+  var low = n.toLowerCase();
+  for(var j=0;j<list.length;j++){ if(list[j].name.toLowerCase() === low) return list[j]; }
+  return null;
+}
+/* 4단계 '사용 에셋' 칸 파싱 → [{type,name,isNew,missing}] */
+function parseUsedAssets(cell, list){
+  var out = [];
+  if(!cell) return out;
+  var txt = cell.replace(/：/g, ":");
+  function pushName(type, raw){
+    var name = raw.trim().replace(/^[-•·]\s*/, "");
+    if(!name || /^(없음|none|n\/a|-)$/i.test(name)) return;
+    var isNew = /^\(?\s*신규\s*\)?/.test(name);
+    if(isNew) name = name.replace(/^\(?\s*신규\s*\)?\s*/, "").trim();
+    var found = findAsset(list, name);
+    var ty = type || (found ? found.type : null);
+    out.push({ type: ty || "char", name: name, isNew: isNew, missing: !found, asset: found });
+  }
+  var segs = txt.split(/\s*\/\s*|\s*;\s*|\r?\n/);
+  var hadType = false;
+  segs.forEach(function(seg){
+    seg = seg.trim();
+    if(!seg) return;
+    var idx = seg.indexOf(":");
+    var type = idx > 0 ? typeFromWord(seg.slice(0, idx)) : null;
+    if(type){
+      hadType = true;
+      seg.slice(idx+1).split(/[,，、·]/).forEach(function(n){ pushName(type, n); });
+    } else if(!hadType){
+      /* 종류 표시가 없는 자유 형식 → 쉼표로 나눠 2단계 표에서 종류를 찾음 */
+      seg.split(/[,，、·]/).forEach(function(n){ pushName(null, n); });
+    }
+  });
+  return out;
+}
+
+/* ---------- 카드 렌더링 ---------- */
+function copyText(txt, done){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done, function(){ fallbackCopy(txt); done(); });
+  } else {
+    fallbackCopy(txt); done();
+  }
+}
+function makeCopyBtn(getText, label){
+  var base = label || "프롬프트 복사";
+  var b = document.createElement("button");
+  b.type = "button";
+  b.className = "copybtn";
+  b.textContent = base;
+  b.addEventListener("click", function(){
+    copyText(getText(), function(){
+      b.textContent = "복사 완료";
+      b.classList.add("copied");
+      setTimeout(function(){ b.textContent = base; b.classList.remove("copied"); }, 1500);
+    });
+  });
+  return b;
+}
+function fallbackCopy(txt){
+  var ta = document.createElement("textarea");
+  ta.value = txt;
+  ta.style.position = "fixed"; ta.style.left = "-9999px";
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  document.body.removeChild(ta);
+}
+function makeBadge(type){
+  var s = document.createElement("span");
+  s.className = "tbadge";
+  s.textContent = TYPE_LABEL[type] || type;
+  return s;
+}
+/* 본문 속 에셋 이름을 종류별 색으로 표시 */
+function escapeRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+function renderHighlighted(el, text, list){
+  el.textContent = "";
+  var names = [];
+  var map = {};
+  list.forEach(function(a){
+    if(a.name.length >= 2 && !map[a.name]){ map[a.name] = a.type; names.push(a.name); }
+  });
+  if(!names.length){ el.textContent = text; return; }
+  names.sort(function(a,b){ return b.length - a.length; });
+  var re = new RegExp("(" + names.map(escapeRe).join("|") + ")", "g");
+  var last = 0, m;
+  while((m = re.exec(text))){
+    if(m.index > last) el.appendChild(document.createTextNode(text.slice(last, m.index)));
+    var s = document.createElement("span");
+    s.className = "hl " + map[m[0]];
+    s.textContent = m[0];
+    el.appendChild(s);
+    last = m.index + m[0].length;
+  }
+  if(last < text.length) el.appendChild(document.createTextNode(text.slice(last)));
+}
+
+function renderCards2(){
+  var box = document.getElementById("cards2");
+  box.innerHTML = "";
+  var list = assetList();
+  TYPE_ORDER.forEach(function(type){
+    var items = list.filter(function(a){ return a.type === type; });
+    if(!items.length) return;
+    var gh = document.createElement("div");
+    gh.className = "grouphead " + type;
+    gh.textContent = TYPE_LABEL[type] + " ";
+    var cnt = document.createElement("span"); cnt.className = "cnt"; cnt.textContent = items.length + "개";
+    gh.appendChild(cnt);
+    box.appendChild(gh);
+    items.forEach(function(a){
+      var card = document.createElement("div");
+      card.className = "ccard " + type;
+      var n = document.createElement("div"); n.className = "cname";
+      n.appendChild(makeBadge(type));
+      n.appendChild(document.createTextNode(a.name));
+      var p = document.createElement("div"); p.className = "cprompt"; p.textContent = a.prompt;
+      card.appendChild(n);
+      if(a.desc){ var r = document.createElement("div"); r.className = "crole"; r.textContent = a.desc; card.appendChild(r); }
+      card.appendChild(p);
+      card.appendChild(makeCopyBtn(function(){ return a.prompt; }));
+      box.appendChild(card);
+    });
+  });
+}
+function renderCards3(){
+  var box = document.getElementById("cards3");
+  box.innerHTML = "";
+  var rows = dropHeader(parseTableRows(document.getElementById("s3result").value));
+  var list = assetList();
+  rows.forEach(function(cells){
+    if(cells.length < 2) return;
+    var page = cells[0];
+    var body = cells.slice(1).join(" | ");
+    if(!body) return;
+    var card = document.createElement("div");
+    card.className = "ccard page";
+    var n = document.createElement("div"); n.className = "cname";
+    n.textContent = /페이지|장|p\.?/i.test(page) ? page : (page + " 페이지");
+    var p = document.createElement("div"); p.className = "cprompt";
+    renderHighlighted(p, body, list.filter(function(a){ return a.type === "char"; }));
+    card.appendChild(n); card.appendChild(p);
+    box.appendChild(card);
+  });
+}
+function finalTag(){
+  var style = document.getElementById("s2style").value.trim() || "(이미지 스타일 미입력)";
+  var w = document.getElementById("s2w").value.trim() || "??";
+  var h = document.getElementById("s2h").value.trim() || "??";
+  return "[화풍: " + style + ", 크기: 가로 " + w + "mm × 세로 " + h + "mm]";
+}
+/* 복사용: 첨부할 참조 이미지 안내문 */
+function refLine(used){
+  var parts = [];
+  TYPE_ORDER.forEach(function(type){
+    var names = used.filter(function(u){ return u.type === type; }).map(function(u){ return u.name; });
+    if(names.length) parts.push(TYPE_LABEL[type] + ": " + names.join(", "));
+  });
+  if(!parts.length) return "";
+  return "[참조 이미지 첨부] " + parts.join(" · ") + " — 첨부한 참조 이미지 속 캐릭터·장면·도구의 외형, 색, 구조를 그대로 유지할 것";
+}
+function renderCards4(){
+  var box = document.getElementById("cards4");
+  box.innerHTML = "";
+  var tag = finalTag();
+  var list = assetList();
+  var rows = dropHeader(parseTableRows(document.getElementById("s4result").value));
+  rows.forEach(function(cells){
+    if(cells.length < 2) return;
+    var page = cells[0];
+    var usedCell = cells.length >= 3 ? cells[1] : "";
+    var scene = cells.length >= 3 ? cells.slice(2).join(" | ") : cells[1];
+    if(!scene) return;
+    var used = parseUsedAssets(usedCell, list);
+    var ref = refLine(used);
+    var full = scene + (ref ? "\n" + ref : "") + "\n" + tag;
+
+    var card = document.createElement("div");
+    card.className = "ccard page";
+    var n = document.createElement("div"); n.className = "cname";
+    n.textContent = /페이지|장|p\.?/i.test(page) ? page : (page + " 페이지");
+    card.appendChild(n);
+
+    if(used.length){
+      var sub = document.createElement("div"); sub.className = "sub"; sub.textContent = "사용 에셋 · 참조 이미지로 첨부";
+      card.appendChild(sub);
+      var chips = document.createElement("div"); chips.className = "chips";
+      used.forEach(function(u){
+        var c = document.createElement(u.asset ? "button" : "span");
+        if(u.asset) c.type = "button";
+        c.className = "chip " + (u.missing ? "missing" : u.type) + (u.asset ? " clickable" : "");
+        var k = document.createElement("span"); k.className = "k"; k.textContent = TYPE_LABEL[u.type] || "";
+        c.appendChild(k);
+        c.appendChild(document.createTextNode((u.isNew ? "(신규) " : "") + u.name));
+        if(u.asset){
+          c.title = "누르면 이 에셋의 참조 프롬프트를 복사합니다\n" + u.asset.prompt;
+          c.addEventListener("click", function(){
+            copyText(u.asset.prompt, function(){
+              c.classList.add("copied");
+              setTimeout(function(){ c.classList.remove("copied"); }, 1200);
+            });
+          });
+        } else {
+          c.title = u.isNew ? "2단계 에셋 표에 없는 새 장면입니다. 필요하면 2단계 표에 추가하세요." : "2단계 에셋 표에서 이 이름을 찾지 못했습니다.";
+        }
+        chips.appendChild(c);
+      });
+      card.appendChild(chips);
+    }
+
+    var p = document.createElement("div"); p.className = "cprompt";
+    renderHighlighted(p, scene, list);
+    card.appendChild(p);
+    if(ref){ var rl = document.createElement("div"); rl.className = "refline"; rl.textContent = ref; card.appendChild(rl); }
+    var t = document.createElement("div"); t.className = "finaltag"; t.textContent = tag;
+    card.appendChild(t);
+    card.appendChild(makeCopyBtn(function(){ return full; }, "최종 프롬프트 복사"));
+    box.appendChild(card);
+  });
+}
+
+/* ---------- 각 단계 프롬프트 ---------- */
+function targetLine(){
+  var t = document.getElementById("s1target").value.trim();
+  return t ? "대상 독자: " + t : "";
+}
+function prompt1(){
+  var c = document.getElementById("s1concept").value.trim();
+  var t = document.getElementById("s1target").value.trim();
+  var m = document.getElementById("s1theme").value.trim();
+  return [
+    "너는 어린이 그림동화 작가야. 아래 조건으로 그림동화 줄거리 초안을 써줘.",
+    "",
+    "컨셉트: " + c,
+    "대상: " + t,
+    "주제: " + m,
+    "",
+    "요구사항:",
+    "- 분량은 500자 정도",
+    "- 기승전결 구조가 뚜렷하게",
+    "- 대상 연령에 맞는 쉬운 어휘로",
+    "- 제목, 머리말, 설명 없이 줄거리 본문만 출력"
+  ].join("\n");
+}
+var DEFAULT_FACES = "기쁨, 슬픔, 놀람, 화남";
+function facesList(){
+  var raw = document.getElementById("s2faces").value.trim() || DEFAULT_FACES;
+  return raw.split(/[,，、/]/).map(function(s){ return s.trim(); }).filter(Boolean);
+}
+function prompt2(){
+  var story = document.getElementById("s1result").value.trim();
+  var style = document.getElementById("s2style").value.trim();
+  var pages = document.getElementById("s3pages").value.trim();
+  var sent = document.getElementById("s3sent").value.trim();
+  var faces = facesList();
+  var tl = targetLine();
+  return [
+    "아래는 그림동화의 줄거리야. 이 동화책의 그림을 만들 때 참조 이미지로 쓸 '에셋'을 뽑고, 에셋마다 참조 이미지 생성 프롬프트를 만들어줘.",
+    "에셋은 세 종류야: 캐릭터, 장면(배경), 도구(소품).",
+    "목적: 모든 페이지에서 같은 캐릭터·같은 장소·같은 물건으로 보이도록, 참조 이미지를 먼저 만들어 두는 것.",
+    "",
+    "[줄거리]",
+    story,
+    tl ? "\n" + tl : "",
+    "",
+    "[책 분량]",
+    "총 " + pages + "페이지, 페이지당 " + sent + "문장. 이 줄거리는 나중에 이 분량의 페이지별 원고로 나뉘고, 페이지마다 그림이 한 장씩 들어가.",
+    "",
+    "[에셋 선별 규칙]",
+    "1. 캐릭터: 여러 페이지에 반복해서 등장하는 주요 캐릭터만 뽑아. 한 번만 나오는 단역은 제외해. (일관성 유지가 목적)",
+    "2. 장면: 먼저 줄거리를 총 " + pages + "페이지로 나눈다고 생각하고, 각 페이지의 그림에 어떤 배경이 필요한지 머릿속으로 짚어 본 뒤, 그 배경·장소를 빠짐없이 모두 뽑아. 개수 제한 없음. 같은 장소라도 낮/밤, 계절, 날씨, 상태(어질러짐·불탐 등)가 크게 다르면 별도 장면으로 나눠. 모든 페이지가 이 장면 목록 중 하나로 그려질 수 있어야 해.",
+    "3. 도구: 이야기에서 중요한 역할을 하거나 반복 등장하는 물건·소품만 뽑아.",
+    "",
+    "[프롬프트 작성 규칙]",
+    "- 공통: 각 프롬프트의 맨 앞에 다음 이미지 스타일을 쉼표와 함께 명시해(괄호 밖에): " + style,
+    "- 공통: '귀여운', '예쁜'처럼 모호한 표현 금지. 색(구체적인 색이름)·모양·크기·재질을 전부 구체적인 단어로 써. 괄호 ( ) 안에는 화풍·스타일 표현을 넣지 말고 오직 고정할 외형 정보만 넣어.",
+    "- 캐릭터: 한 장의 '캐릭터 시트(character design sheet, turnaround)'로 만들어. 한 이미지 안에 같은 캐릭터를 이렇게 배치해 — 윗줄: 전신 정면(front view), 전신 옆모습(side view, 왼쪽 프로필), 전신 뒷모습(back view)을 같은 크기·같은 중립 자세(두 팔을 자연스럽게 내리고 똑바로 선 자세)로 나란히 / 아랫줄: 얼굴 클로즈업 표정 " + faces.length + "개(" + faces.join(", ") + "). 프롬프트 본문에 이 배치를 영어 키워드로도 함께 써(예: 'character design sheet, full body turnaround: front view, side view, back view, same scale; expression sheet: ...'). 괄호 ( ) 안에 초상세 외형 고정 명세를 써. 항목 전부: 종/정체, 나이·성별 느낌, 체형·비율(머리:몸 비율), 피부/털 색·질감·무늬, 얼굴형, 눈(모양·크기·색), 코·입 모양, 귀/머리카락(모양·색), 시그니처 포인트 1~2개(어떤 장면에서도 변하지 않는 표식), 상의·하의·신발(종류·색·무늬), 액세서리, 대표 색 팔레트 2~3개. 문장 끝에 '모든 뷰와 표정에서 같은 캐릭터로 일관성 유지(consistent character), 화이트 배경, 글자·라벨 없음(no text, no labels)'을 쉼표와 함께 붙여.",
+    "- 장면: 캐릭터가 전혀 없는 빈 배경으로. 공간 전체 구조가 보이는 넓은 전경(와이드 샷). 괄호 ( ) 안에 고정 명세: 장소 종류, 공간 구조와 주요 사물 배치(왼쪽/가운데/오른쪽/앞/뒤), 핵심 지형지물 2~3개(어떤 페이지에서도 변하지 않는 표식), 색 팔레트, 시간대·조명·날씨, 분위기. 문장 끝에 '캐릭터 없음, 텍스트 없음'을 쉼표와 함께 붙여.",
+    "- 도구: 물건 하나만 단독으로. 괄호 ( ) 안에 고정 명세: 종류, 크기 느낌(손에 쥐는 크기 등), 형태, 재질, 색, 무늬·장식, 시그니처 디테일 1~2개. 정면 또는 비스듬한 3/4 시점. 문장 끝에 '물건 단독, 화이트 배경'을 쉼표와 함께 붙여.",
+    "- 표 칸 안에는 | 기호를 쓰지 마. 설명 칸은 한 줄로 짧게(어떤 역할인지, 어느 대목에 나오는지).",
+    "",
+    "[출력 형식]",
+    "다른 말 없이 아래 마크다운 표만 출력해. 종류 칸에는 '캐릭터', '장면', '도구' 셋 중 하나만 써. 캐릭터 → 장면 → 도구 순서로 나열해.",
+    "| 종류 | 에셋 이름 | 설명 | 참조 이미지 프롬프트 |",
+    "|---|---|---|---|"
+  ].join("\n");
+}
+function prompt3(){
+  var story = document.getElementById("s1result").value.trim();
+  var assets = document.getElementById("s2result").value.trim();
+  var pages = document.getElementById("s3pages").value.trim();
+  var sent = document.getElementById("s3sent").value.trim();
+  var tl = targetLine();
+  return [
+    "아래 줄거리와 에셋 표를 바탕으로 그림동화의 페이지별 원고를 써줘.",
+    "",
+    "[줄거리]",
+    story,
+    tl ? "\n" + tl : "",
+    "",
+    "[에셋 표 — 캐릭터 이름과 장소·물건 이름은 여기 이름을 그대로 써]",
+    assets,
+    "",
+    "[작성 규칙]",
+    "1. 총 " + pages + "개 페이지로 나눠서 작성해.",
+    "2. 페이지당 " + sent + "문장으로 써.",
+    "3. 실제 동화책에 인쇄될 글이므로, 캐릭터 이름 앞에 외형 묘사를 반복하지 마. 이름만 자연스럽게 써.",
+    "4. 캐릭터·장소·물건을 부를 때는 에셋 표의 '에셋 이름'을 그대로 써서, 나중에 그림과 짝을 맞추기 쉽게 해.",
+    "5. 대상 독자 연령에 맞는 쉬운 어휘로, 이야기가 자연스럽게 이어지게 써.",
+    "6. 표 칸 안에는 | 기호를 쓰지 마.",
+    "",
+    "[출력 형식]",
+    "다른 말 없이 아래 마크다운 표만 출력해:",
+    "| 페이지 | 원고 |",
+    "|---|---|"
+  ].join("\n");
+}
+function prompt4(){
+  var assets = document.getElementById("s2result").value.trim();
+  var script = document.getElementById("s3result").value.trim();
+  return [
+    "아래 에셋 표와 페이지별 원고를 바탕으로, 각 페이지의 장면 이미지 프롬프트를 만들어줘.",
+    "이 프롬프트는 이미지 생성 AI에 넣을 때 에셋 표의 참조 이미지(캐릭터·장면·도구)를 함께 첨부해서 사용할 거야. 그래서 각 페이지마다 '어떤 에셋을 첨부해야 하는지'도 함께 적어줘.",
+    "",
+    "[에셋 표]",
+    assets,
+    "",
+    "[페이지별 원고]",
+    script,
+    "",
+    "[작성 규칙 - 반드시 지켜]",
+    "1. 사용 에셋 칸: 그 페이지 그림에 등장하는 에셋을 에셋 표의 '에셋 이름'과 글자 하나 다르지 않게 똑같이 적어. 형식은 정확히 이렇게: 캐릭터: 이름1, 이름2 / 장면: 이름 / 도구: 이름1, 이름2 — 해당 종류가 없으면 '없음'이라고 써. 장면은 페이지마다 반드시 1개를 골라.",
+    "2. 에셋 표에 없는 배경이 꼭 필요하면 장면 칸에 '(신규) 이름'으로 적어. 캐릭터는 표에 있는 주요 캐릭터만 사용 에셋에 적고, 표에 없는 단역은 장면 프롬프트 본문에서만 외형을 짧게 묘사해.",
+    "3. 장면 프롬프트 칸: 그림 한 장을 완성할 수 있도록 전체 장면을 구체적으로 묘사해 — 구도와 카메라(와이드/미디엄/클로즈업, 눈높이/부감 등), 각 캐릭터의 위치·자세·표정·행동, 배경(장면 에셋의 공간 구조와 사물 배치를 그대로 유지), 도구의 위치와 쓰임, 조명·시간대·분위기·감정.",
+    "4. 에셋은 반드시 에셋 표의 이름을 그대로 써. 캐릭터는 처음 언급할 때 '이름(시그니처 포인트 1~2개)'처럼 핵심 식별 특징만 짧게 덧붙이고, 외형 전체를 다시 쓰지는 마(참조 이미지가 첨부되니까). 색·의상·시그니처 포인트를 에셋 표와 다르게 바꾸는 것은 절대 금지.",
+    "5. 캐릭터 시트의 중립 자세(정면, 팔 내림, 똑바로 서기)를 그대로 쓰지 말고, 그 장면에 어울리는 새로운 자세·표정·행동으로 써. 표정은 시트에 있는 표정 중 하나를 골라 쓰면 참조 이미지와 맞추기 좋아.",
+    "6. 문장 끝은 '~하는 모습'으로 끝내고, 각 프롬프트의 마지막에 '텍스트 없는 순수 일러스트(textless pure illustration, no text, no words)'를 포함해.",
+    "7. 표 칸 안에는 | 기호를 쓰지 마.",
+    "",
+    "[출력 형식]",
+    "다른 말 없이 아래 마크다운 표만 출력해:",
+    "| 페이지 | 사용 에셋 | 장면 프롬프트 |",
+    "|---|---|---|"
+  ].join("\n");
+}
+
+/* ---------- 생성 버튼 ---------- */
+function bindGen(n, btnId, label, validate, buildPrompt, resultId, afterRender){
+  document.getElementById(btnId).addEventListener("click", function(){
+    clearError(n);
+    var msg = validate();
+    if(msg){ showError(n, msg); return; }
+    var btn = document.getElementById(btnId);
+    var resultEl = document.getElementById(resultId);
+    var before = resultEl.value;
+    /* 스트리밍: 받는 대로 결과칸에 채워 넣음 (카드는 끝난 뒤 그림) */
+    withLoading(btn, label, function(){
+      return callGemini(buildPrompt(), function(partial){ resultEl.value = partial; });
+    })
+      .then(function(text){
+        document.getElementById(resultId).value = text;
+        if(afterRender) afterRender();
+        saveState();
+        showStep(state.step);
+      })
+      .catch(function(err){
+        resultEl.value = before;   /* 실패하면 스트리밍으로 채우던 내용은 지우고 원래대로 */
+        showError(n, err.message);
+      });
+  });
+}
+
+/* 1단계는 직접 작성이 기본. AI 초안은 선택이며, 이미 쓴 내용이 있으면 덮어쓸지 묻는다 */
+bindGen(1, "btnGen1", "AI로 초안 받기 (선택)", function(){
+  if(!document.getElementById("apiKey").value.trim()) return "먼저 Gemini API 키를 입력하세요.";
+  if(!document.getElementById("s1concept").value.trim() &&
+     !document.getElementById("s1target").value.trim() &&
+     !document.getElementById("s1theme").value.trim()) return "AI 초안을 받으려면 컨셉트, 대상, 주제 중 하나 이상을 입력해 주세요.";
+  if(document.getElementById("s1result").value.trim() &&
+     !confirm("이미 쓴 줄거리가 있습니다. AI 초안으로 덮어쓸까요?")) return "취소했습니다. 쓴 줄거리를 그대로 둡니다.";
+  return "";
+}, prompt1, "s1result", null);
+
+bindGen(2, "btnGen2", "에셋 생성", function(){
+  if(!document.getElementById("apiKey").value.trim()) return "먼저 Gemini API 키를 입력하세요.";
+  if(!document.getElementById("s1result").value.trim()) return "1단계 줄거리가 비어 있습니다. 먼저 줄거리를 써 주세요.";
+  if(!document.getElementById("s3pages").value.trim() || !document.getElementById("s3sent").value.trim()) return "1단계에서 원고 총 개수와 페이지당 문장 수를 먼저 정해 주세요. (장면 개수를 책 분량에 맞추기 위해 필요합니다)";
+  if(!document.getElementById("s2style").value.trim()) return "원하는 이미지 스타일을 입력해 주세요.";
+  return "";
+}, prompt2, "s2result", function(){ renderCards2(); renderCards3(); renderCards4(); });
+
+bindGen(3, "btnGen3", "원고 생성", function(){
+  if(!document.getElementById("apiKey").value.trim()) return "먼저 Gemini API 키를 입력하세요.";
+  if(!document.getElementById("s1result").value.trim()) return "1단계 줄거리가 비어 있습니다.";
+  if(!document.getElementById("s2result").value.trim()) return "2단계 에셋 표가 비어 있습니다.";
+  if(!document.getElementById("s3pages").value.trim() || !document.getElementById("s3sent").value.trim()) return "1단계에서 원고 총 개수와 페이지당 문장 수를 정해 주세요.";
+  return "";
+}, prompt3, "s3result", renderCards3);
+
+/* 3단계 머리글에 1단계에서 정한 분량 표시 */
+function updateS3Summary(){
+  var p = document.getElementById("s3pages").value.trim();
+  var s = document.getElementById("s3sent").value.trim();
+  document.getElementById("s3summary").textContent = (p && s)
+    ? "1단계에서 정한 분량: 총 " + p + "페이지 · 페이지당 " + s + "문장. 2단계 에셋 표의 이름을 그대로 써서 원고를 나눕니다."
+    : "1단계에서 원고 총 개수와 페이지당 문장 수를 아직 정하지 않았습니다. [분량 바꾸기]로 돌아가 정해 주세요.";
+}
+
+bindGen(4, "btnGen4", "장면 생성", function(){
+  if(!document.getElementById("apiKey").value.trim()) return "먼저 Gemini API 키를 입력하세요.";
+  if(!document.getElementById("s2result").value.trim()) return "2단계 에셋 표가 비어 있습니다.";
+  if(!document.getElementById("s3result").value.trim()) return "3단계 원고가 비어 있습니다.";
+  return "";
+}, prompt4, "s4result", renderCards4);
+
+/* ---------- 이벤트 연결 ---------- */
+document.getElementById("btnKeySave").addEventListener("click", function(){
+  var key = document.getElementById("apiKey").value.trim();
+  if(!key){
+    keyPersisted = false;
+    try{ localStorage.removeItem(LS_API_KEY); }catch(e){}
+    updateKeyStatus();
+    alert("입력된 키가 없습니다. 브라우저에 저장된 키가 있었다면 삭제했습니다.");
+    return;
+  }
+  var ok = confirm(
+    "이 브라우저에 API 키를 저장하시겠습니까?\n\n" +
+    "[확인] → 이 컴퓨터의 브라우저(localStorage)에 저장되어, 새로고침이나 재접속 후에도 유지됩니다.\n" +
+    "[취소] → 저장하지 않고 이번 화면에서만 사용합니다. 창을 닫으면 키가 사라집니다.\n\n" +
+    "※ 공용 컴퓨터라면 [취소]를 권장합니다."
+  );
+  if(ok){
+    try{ localStorage.setItem(LS_API_KEY, key); keyPersisted = true; }
+    catch(e){ keyPersisted = false; alert("브라우저 저장에 실패했습니다. 이번 화면에서만 키를 사용합니다."); }
+  } else {
+    keyPersisted = false;
+    try{ localStorage.removeItem(LS_API_KEY); }catch(e){}
+  }
+  updateKeyStatus();
+});
+document.getElementById("btnKeyClear").addEventListener("click", function(){
+  if(!confirm("이 브라우저에 저장된 API 키를 삭제할까요?\n\n입력칸도 함께 비워집니다. 다시 사용하려면 키를 새로 붙여넣으세요.")) return;
+  try{ localStorage.removeItem(LS_API_KEY); }catch(e){}
+  keyPersisted = false;
+  document.getElementById("apiKey").value = "";
+  updateKeyStatus();
+});
+function updateKeyStatus(){
+  var el = document.getElementById("keyStatus");
+  var has = !!document.getElementById("apiKey").value.trim();
+  document.getElementById("btnKeyClear").hidden = !keyPersisted;
+  if(has && keyPersisted){
+    el.textContent = "키가 이 브라우저에 저장되어 있습니다. 새로고침해도 유지됩니다.";
+    el.className = "keystatus ok";
+  } else if(has){
+    el.textContent = "키가 입력되어 있지만 브라우저에는 저장되지 않았습니다. (이번 화면에서만 사용 · 저장하려면 [키 저장])";
+    el.className = "keystatus temp";
+  } else {
+    el.textContent = "키가 아직 저장되지 않았습니다.";
+    el.className = "keystatus no";
+  }
+}
+document.getElementById("modelPref").addEventListener("change", function(){
+  lastGoodModel = null;   /* 선택을 바꾸면 자동 순서도 처음부터 다시 */
+  document.getElementById("modelNote").textContent = describeOrder();
+  saveState();
+});
+document.getElementById("apiKey").addEventListener("input", function(){
+  var cur = document.getElementById("apiKey").value.trim();
+  var saved = "";
+  try{ saved = localStorage.getItem(LS_API_KEY) || ""; }catch(e){}
+  keyPersisted = !!cur && cur === saved;
+  updateKeyStatus();
+});
+
+fieldIds.forEach(function(id){
+  var el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener("input", function(){
+    saveState();
+    if(id === "s2result"){ renderCards2(); renderCards3(); renderCards4(); }  /* 에셋 이름이 바뀌면 색 표시도 다시 */
+    if(id === "s3result") renderCards3();
+    if(id === "s4result") renderCards4();
+    if(id === "s2style" || id === "s2w" || id === "s2h") renderCards4();
+    if(id === "s3pages" || id === "s3sent") updateS3Summary();
+    if(id === "s1concept" || id === "s2w" || id === "s2h" || id === "s3pages" || id === "s3result") bookDirty = true;
+  });
+});
+
+document.querySelectorAll("#stepNav button").forEach(function(b){
+  b.addEventListener("click", function(){
+    showStep(parseInt(b.getAttribute("data-step"),10));
+  });
+});
+document.querySelectorAll("button[data-go]").forEach(function(b){
+  b.addEventListener("click", function(){
+    showStep(parseInt(b.getAttribute("data-go"),10));
+  });
+});
+
+/* ---------- JSON 저장 / 불러오기 ---------- */
+function showJsonError(msg){
+  var el = document.getElementById("errJson");
+  el.textContent = msg; el.classList.add("show");
+}
+function clearJsonError(){
+  var el = document.getElementById("errJson");
+  el.textContent = ""; el.classList.remove("show");
+}
+function pad2(n){ return (n < 10 ? "0" : "") + n; }
+function stamp(){
+  var d = new Date();
+  return d.getFullYear() + pad2(d.getMonth()+1) + pad2(d.getDate()) + "_" + pad2(d.getHours()) + pad2(d.getMinutes());
+}
+document.getElementById("btnJsonSave").addEventListener("click", function(){
+  clearJsonError();
+  saveState();
+  var data = { app: "storybook-prompt-generator", version: APP_VERSION, savedAt: new Date().toISOString(), step: state.step, fields: {} };
+  fieldIds.forEach(function(id){ data.fields[id] = document.getElementById(id).value; });  /* apiKey 제외 */
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  var title = (document.getElementById("s1concept").value.trim() || "동화책_프롬프트").replace(/[\\/:*?"<>|]/g, "").slice(0, 30);
+  a.download = title + "_" + stamp() + ".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+});
+document.getElementById("btnJsonLoad").addEventListener("click", function(){
+  clearJsonError();
+  document.getElementById("jsonFile").value = "";
+  document.getElementById("jsonFile").click();
+});
+document.getElementById("jsonFile").addEventListener("change", function(){
+  var file = this.files && this.files[0];
+  if(!file) return;
+  var hasContent = fieldIds.some(function(id){ return document.getElementById(id).value.trim(); });
+  if(hasContent && !confirm("현재 작업 내용이 불러온 파일 내용으로 바뀝니다. 계속할까요?")){ return; }
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var data = JSON.parse(reader.result);
+      var fields = (data && data.fields) ? data.fields : data;   /* 구형 형식(평면 객체)도 허용 */
+      if(!fields || typeof fields !== "object") throw new Error("형식 오류");
+      var count = 0;
+      fieldIds.forEach(function(id){
+        if(fields[id] !== undefined && fields[id] !== null){ document.getElementById(id).value = String(fields[id]); count++; }
+      });
+      if(!count) throw new Error("이 앱의 작업 파일이 아닙니다.");
+      saveState();
+      renderCards2(); renderCards3(); renderCards4();
+      bookDirty = true;
+      var s = parseInt(data.step, 10);
+      showStep(s >= 1 && s <= LAST_STEP ? s : 1);
+      alert("불러오기 완료: " + file.name + (data.savedAt ? "\n저장 시각: " + new Date(data.savedAt).toLocaleString("ko-KR") : ""));
+    }catch(e){
+      showJsonError("JSON 파일을 읽지 못했습니다. 이 앱에서 저장한 파일인지 확인해 주세요.\n(원문: " + e.message + ")");
+    }
+  };
+  reader.onerror = function(){ showJsonError("파일을 읽는 중 오류가 발생했습니다."); };
+  reader.readAsText(file, "utf-8");
+});
+
+/* ---------- 좌우 플로팅 이동 버튼 ---------- */
+document.getElementById("floatPrev").addEventListener("click", function(){
+  if(state.step > 1) showStep(state.step - 1);
+});
+document.getElementById("floatNext").addEventListener("click", function(){
+  if(state.step < LAST_STEP) showStep(state.step + 1);
+});
+document.addEventListener("keydown", function(e){
+  var tag = (e.target && e.target.tagName || "").toLowerCase();
+  if(tag === "input" || tag === "textarea" || e.altKey || e.ctrlKey || e.metaKey) return;
+  if(state.step === 7 && pf){   /* 7단계에서는 화살표로 책장을 넘긴다 */
+    if(e.key === "ArrowLeft"){ e.preventDefault(); unlockAudio(); pf.flipPrev(); }
+    if(e.key === "ArrowRight"){ e.preventDefault(); unlockAudio(); pf.flipNext(); }
+    if(e.key === " " && tag !== "button"){ e.preventDefault(); document.getElementById("bkPlay").click(); }
+    return;
+  }
+  if(e.key === "ArrowLeft" && state.step > 1) showStep(state.step - 1);
+  if(e.key === "ArrowRight" && state.step < LAST_STEP) showStep(state.step + 1);
+});
+
+/* ---------- 5·6단계: 쪽별 그림·음성 (브라우저 IndexedDB에만 보관) ---------- */
+var DB_NAME = "storybookAudioFlipbook_v8", DB_STORE = "media";
+var media = { img: {}, aud: {} };   /* 쪽 번호 → 그림 { blob, name, url, w, h, fx, fy } / 음성 { blob, name, url, dur } */
+var mediaSaved = true;              /* IndexedDB를 못 쓰면 false → 새로고침하면 사라짐 */
+var dbPromise = null;
+var bookDirty = true;               /* 7단계 책을 다시 만들어야 하는지 */
+
+function openDB(){
+  if(dbPromise) return dbPromise;
+  dbPromise = new Promise(function(resolve, reject){
+    if(!window.indexedDB){ reject(new Error("IndexedDB 없음")); return; }
+    var req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = function(){ req.result.createObjectStore(DB_STORE); };
+    req.onsuccess = function(){ resolve(req.result); };
+    req.onerror = function(){ reject(req.error); };
+  });
+  return dbPromise;
+}
+function idbWrite(fn){
+  return openDB().then(function(db){
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction(DB_STORE, "readwrite");
+      fn(tx.objectStore(DB_STORE));
+      tx.oncomplete = function(){ resolve(); };
+      tx.onerror = tx.onabort = function(){ reject(tx.error); };
+    });
+  }).catch(function(){ mediaSaved = false; renderMediaStats(); });
+}
+function idbAll(){
+  return openDB().then(function(db){
+    return new Promise(function(resolve, reject){
+      var out = {};
+      var tx = db.transaction(DB_STORE, "readonly");
+      var cur = tx.objectStore(DB_STORE).openCursor();
+      cur.onsuccess = function(){ var c = cur.result; if(c){ out[c.key] = c.value; c.continue(); } };
+      tx.oncomplete = function(){ resolve(out); };
+      tx.onerror = function(){ reject(tx.error); };
+    });
+  });
+}
+function recordOf(kind, rec){   /* 저장용: 화면용 url은 빼고 저장 */
+  var o = {}; Object.keys(rec).forEach(function(k){ if(k !== "url") o[k] = rec[k]; }); return o;
+}
+function saveMedia(kind, n){
+  var rec = media[kind][n];
+  return idbWrite(function(st){
+    if(rec) st.put(recordOf(kind, rec), kind + ":" + n); else st.delete(kind + ":" + n);
+  });
+}
+
+/* 3단계 원고 표 → [{n, text}] (1단계 원고 총 개수만큼, 원고가 없는 쪽은 빈 글) */
+function storyPages(){
+  var rows = dropHeader(parseTableRows(document.getElementById("s3result").value)).filter(function(cells){
+    return cells.length >= 2 && cells.slice(1).join("").trim();
+  });
+  /* 쪽 번호가 적힌 줄이 있으면 그 줄만 쓴다 (머리글·설명 줄 섞임 방지) */
+  if(rows.some(function(c){ return /\d/.test(c[0]); })) rows = rows.filter(function(c){ return /\d/.test(c[0]); });
+  var found = {}, maxN = 0, seq = 0;
+  rows.forEach(function(cells){
+    var body = cells.slice(1).join(" | ").trim();
+    seq++;
+    var m = String(cells[0]).match(/\d+/);
+    var n = m ? parseInt(m[0], 10) : seq;
+    if(!found[n]) found[n] = body;
+    if(n > maxN) maxN = n;
+  });
+  var total = Math.max(parseInt(document.getElementById("s3pages").value, 10) || 0, maxN);
+  var pages = [];
+  for(var i = 1; i <= total; i++) pages.push({ n: i, text: found[i] || "" });
+  return pages;
+}
+function bookRatio(){   /* 세로 ÷ 가로 (2단계 크기, 없으면 정사각형) */
+  var w = parseFloat(document.getElementById("s2w").value) || 0;
+  var h = parseFloat(document.getElementById("s2h").value) || 0;
+  return (w > 0 && h > 0) ? h / w : 1;
+}
+
+/* 파일 이름 속 숫자가 딱 하나(3자리 이하)일 때만 쪽 번호로 본다: 1p.mp3, p03.png, 3쪽.png */
+function pageNumFromName(name){
+  var nums = name.replace(/\.[^.]+$/, "").match(/\d+/g);
+  if(!nums || nums.length !== 1 || nums[0].length > 3) return null;
+  return parseInt(nums[0], 10);
+}
+function orderFiles(files, total){
+  files = Array.prototype.slice.call(files);
+  var used = {};
+  var nums = files.map(function(f){ return pageNumFromName(f.name); });
+  var byNum = nums.every(function(x){
+    if(x === null || x < 1 || x > total || used[x]) return false;
+    used[x] = true; return true;
+  });
+  if(byNum) return { how: "파일 이름의 쪽 번호", list: files.map(function(f, i){ return { n: nums[i], file: f }; }) };
+  files.sort(function(a, b){
+    return (a.lastModified - b.lastModified) || a.name.localeCompare(b.name, undefined, { numeric: true });
+  });
+  return { how: "파일을 받은(저장한) 시각 순서", list: files.slice(0, total).map(function(f, i){ return { n: i + 1, file: f }; }), extra: Math.max(0, files.length - total) };
+}
+function isAudioFile(f){ return /^audio\//.test(f.type) || /\.(mp3|wav|m4a|aac|ogg|oga|flac|webm)$/i.test(f.name); }
+function isImageFile(f){ return /^image\//.test(f.type) || /\.(png|jpe?g|webp|gif|avif|bmp)$/i.test(f.name); }
+
+function probeImage(url){
+  return new Promise(function(resolve, reject){
+    var im = new Image();
+    im.onload = function(){ resolve({ w: im.naturalWidth, h: im.naturalHeight }); };
+    im.onerror = function(){ reject(new Error("그림을 열 수 없음")); };
+    im.src = url;
+  });
+}
+function probeAudio(url){
+  return new Promise(function(resolve, reject){
+    var a = new Audio();
+    var t = setTimeout(function(){ resolve(NaN); }, 8000);
+    a.preload = "metadata";
+    a.onloadedmetadata = function(){ clearTimeout(t); resolve(a.duration); };
+    a.onerror = function(){ clearTimeout(t); reject(new Error("음성을 열 수 없음")); };
+    a.src = url;
+  });
+}
+function setMedia(kind, n, file){
+  var url = URL.createObjectURL(file);
+  var probe = kind === "img" ? probeImage(url) : probeAudio(url);
+  return probe.then(function(info){
+    var old = media[kind][n];
+    if(old && old.url) URL.revokeObjectURL(old.url);
+    var rec = kind === "img"
+      ? { blob: file, name: file.name, url: url, w: info.w, h: info.h, fx: 50, fy: 50 }
+      : { blob: file, name: file.name, url: url, dur: info };
+    media[kind][n] = rec;
+    bookDirty = true;
+    return saveMedia(kind, n);
+  }, function(err){
+    URL.revokeObjectURL(url);
+    throw new Error(file.name + ": " + err.message);
+  });
+}
+function removeMedia(kind, n){
+  var old = media[kind][n];
+  if(old && old.url) URL.revokeObjectURL(old.url);
+  delete media[kind][n];
+  bookDirty = true;
+  return saveMedia(kind, n);
+}
+function swapMedia(kind, a, b){
+  var t = media[kind][a];
+  if(media[kind][b]) media[kind][a] = media[kind][b]; else delete media[kind][a];
+  if(t) media[kind][b] = t; else delete media[kind][b];
+  bookDirty = true;
+  return Promise.all([saveMedia(kind, a), saveMedia(kind, b)]);
+}
+function addMany(kind, fileList){
+  var step = kind === "img" ? 5 : 6;
+  clearError(step);
+  var files = Array.prototype.filter.call(fileList, kind === "img" ? isImageFile : isAudioFile);
+  var skipped = fileList.length - files.length;
+  var total = storyPages().length;
+  if(!total){ showError(step, "쪽 수가 정해지지 않았습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 3단계 원고를 먼저 만들어 주세요."); return; }
+  if(!files.length){ showError(step, kind === "img" ? "그림 파일이 없습니다." : "음성 파일이 없습니다."); return; }
+  var plan = orderFiles(files, total);
+  var replacing = plan.list.filter(function(x){ return media[kind][x.n]; }).length;
+  if(replacing && !confirm("이미 " + (kind === "img" ? "그림" : "음성") + "이 있는 쪽 " + replacing + "개가 새 파일로 바뀝니다. 계속할까요?")) return;
+  var notes = [];
+  Promise.all(plan.list.map(function(x){
+    return setMedia(kind, x.n, x.file).catch(function(e){ notes.push(e.message); });
+  })).then(function(){
+    if(kind === "img") renderGrid5(); else renderGrid6();
+    var msg = plan.list.length + "개를 " + plan.how + "대로 넣었습니다.";
+    if(plan.extra) notes.push("쪽 수(" + total + "쪽)보다 많은 " + plan.extra + "개는 넣지 않았습니다.");
+    if(skipped) notes.push((kind === "img" ? "그림" : "음성") + "이 아닌 파일 " + skipped + "개는 건너뛰었습니다.");
+    setStatNote(kind, msg);
+    if(notes.length) showError(step, notes.join("\n"));
+  });
+}
+
+/* ---------- 5·6단계 화면 ---------- */
+var statNote = { img: "", aud: "" };
+function setStatNote(kind, msg){ statNote[kind] = msg; renderMediaStats(); }
+function renderMediaStats(){
+  var pages = storyPages();
+  [["img", "stat5", "그림"], ["aud", "stat6", "음성"]].forEach(function(x){
+    var el = document.getElementById(x[1]);
+    if(!el) return;
+    if(!pages.length){
+      el.className = "mstat warn";
+      el.textContent = "쪽 수가 정해지지 않았습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 3단계 원고를 먼저 만들어 주세요.";
+      return;
+    }
+    var have = pages.filter(function(p){ return media[x[0]][p.n]; });
+    var missing = pages.filter(function(p){ return !media[x[0]][p.n]; }).map(function(p){ return p.n; });
+    var txt = pages.length + "쪽 중 " + have.length + "쪽에 " + x[2] + "이 있습니다.";
+    if(x[0] === "aud" && have.length){
+      var sum = have.reduce(function(s, p){ var d = media.aud[p.n].dur; return s + (isFinite(d) ? d : 0); }, 0);
+      txt += " (모두 " + Math.round(sum) + "초)";
+    }
+    if(missing.length) txt += " " + x[2] + "이 없는 쪽: " + missing.join(", ");
+    if(statNote[x[0]]) txt += " · " + statNote[x[0]];
+    if(!mediaSaved) txt += "\n※ 이 브라우저에서는 " + x[2] + "을 저장할 수 없어 새로고침하면 다시 올려야 합니다.";
+    el.className = "mstat" + (missing.length || !mediaSaved ? " warn" : "");
+    el.style.whiteSpace = "pre-line";
+    el.textContent = txt;
+  });
+}
+function miniBtn(label, title, onClick, disabled, cls){
+  var b = document.createElement("button");
+  b.type = "button"; b.textContent = label; b.title = title;
+  if(cls) b.className = cls;
+  b.disabled = !!disabled;
+  b.addEventListener("click", onClick);
+  return b;
+}
+var pickTarget = { img: 0, aud: 0 };
+function pickOne(kind, n){
+  pickTarget[kind] = n;
+  var inp = document.getElementById(kind === "img" ? "imgOne" : "audOne");
+  inp.value = ""; inp.click();
+}
+function acceptDropOn(el, onFiles){
+  el.addEventListener("dragover", function(e){ e.preventDefault(); el.classList.add("over"); });
+  el.addEventListener("dragleave", function(){ el.classList.remove("over"); });
+  el.addEventListener("drop", function(e){
+    e.preventDefault(); e.stopPropagation(); el.classList.remove("over");
+    if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) onFiles(e.dataTransfer.files);
+  });
+}
+function setOneFromList(kind, n, list){
+  var step = kind === "img" ? 5 : 6;
+  var f = Array.prototype.filter.call(list, kind === "img" ? isImageFile : isAudioFile)[0];
+  if(!f){ showError(step, kind === "img" ? "그림 파일이 아닙니다." : "음성 파일이 아닙니다."); return; }
+  clearError(step);
+  setMedia(kind, n, f).then(function(){
+    statNote[kind] = "";
+    if(kind === "img") renderGrid5(); else renderGrid6();
+  }, function(e){ showError(step, e.message + "\n(그림은 PNG·JPG·WEBP, 음성은 MP3·WAV·M4A를 쓰세요)"); });
+}
+function cardBase(kind, p, total){
+  var card = document.createElement("div");
+  card.className = "mcard";
+  var has = !!media[kind][p.n];
+  var head = document.createElement("div"); head.className = "mhead";
+  var title = document.createElement("b"); title.textContent = p.n + "쪽";
+  var badge = document.createElement("span");
+  badge.className = "mbadge " + (has ? "ok" : "no");
+  badge.textContent = has ? (kind === "img" ? "그림 있음" : "음성 있음") : (kind === "img" ? "그림 없음" : "음성 없음");
+  head.appendChild(title); head.appendChild(badge);
+  card.appendChild(head);
+  acceptDropOn(card, function(files){ setOneFromList(kind, p.n, files); });
+  return card;
+}
+function cardButtons(kind, p, total, rerender){
+  var has = !!media[kind][p.n];
+  var row = document.createElement("div"); row.className = "mbtns";
+  row.appendChild(miniBtn("◀", "앞 쪽과 바꾸기", function(){ swapMedia(kind, p.n, p.n - 1).then(rerender); }, p.n <= 1));
+  row.appendChild(miniBtn(has ? "바꾸기" : (kind === "img" ? "그림 고르기" : "음성 고르기"), "이 쪽의 파일 고르기", function(){ pickOne(kind, p.n); }, false, "main"));
+  row.appendChild(miniBtn("빼기", "이 쪽에서 빼기 (원본 파일은 그대로)", function(){ removeMedia(kind, p.n).then(rerender); }, !has));
+  row.appendChild(miniBtn("▶", "뒤 쪽과 바꾸기", function(){ swapMedia(kind, p.n, p.n + 1).then(rerender); }, p.n >= total));
+  return row;
+}
+function textLine(p){
+  var t = document.createElement("div"); t.className = "mtext";
+  t.textContent = p.text || "(3단계 원고 없음)";
+  return t;
+}
+function renderGrid5(){
+  var grid = document.getElementById("grid5");
+  if(!grid) return;
+  grid.innerHTML = "";
+  var pages = storyPages(), ratio = bookRatio();
+  pages.forEach(function(p){
+    var rec = media.img[p.n];
+    var card = cardBase("img", p, pages.length);
+    var thumb = document.createElement("div"); thumb.className = "mthumb";
+    thumb.style.paddingTop = (ratio * 100) + "%";
+    thumb.title = "눌러서 그림 고르기 · 파일을 끌어다 놓아도 됩니다";
+    thumb.addEventListener("click", function(){ pickOne("img", p.n); });
+    if(rec){
+      var im = document.createElement("img");
+      im.src = rec.url; im.alt = p.n + "쪽 그림";
+      im.style.objectPosition = rec.fx + "% " + rec.fy + "%";
+      thumb.appendChild(im);
+    } else {
+      var em = document.createElement("div"); em.className = "empty";
+      em.innerHTML = "그림 없음<br>눌러서 고르거나<br>파일을 끌어다 놓으세요";
+      thumb.appendChild(em);
+    }
+    card.appendChild(thumb);
+    if(rec && rec.w && rec.h && Math.abs(rec.h / rec.w - ratio) > 0.01){
+      var wide = (rec.h / rec.w) < ratio;   /* 책보다 가로로 긴 그림 → 좌우 위치 */
+      var crop = document.createElement("label"); crop.className = "mcrop";
+      crop.appendChild(document.createTextNode(wide ? "좌우 위치" : "위아래 위치"));
+      var rg = document.createElement("input");
+      rg.type = "range"; rg.min = 0; rg.max = 100; rg.value = wide ? rec.fx : rec.fy;
+      var saveT = null;
+      rg.addEventListener("input", function(){
+        if(wide) rec.fx = +rg.value; else rec.fy = +rg.value;
+        thumb.querySelector("img").style.objectPosition = rec.fx + "% " + rec.fy + "%";
+        bookDirty = true;
+        clearTimeout(saveT); saveT = setTimeout(function(){ saveMedia("img", p.n); }, 300);
+      });
+      crop.appendChild(rg);
+      card.appendChild(crop);
+    }
+    card.appendChild(textLine(p));
+    card.appendChild(cardButtons("img", p, pages.length, renderGrid5));
+    if(rec){ var nm = document.createElement("div"); nm.className = "mname"; nm.textContent = rec.name + (rec.w ? " · " + rec.w + "×" + rec.h : ""); card.appendChild(nm); }
+    grid.appendChild(card);
+  });
+  renderMediaStats();
+}
+function renderGrid6(){
+  var grid = document.getElementById("grid6");
+  if(!grid) return;
+  grid.innerHTML = "";
+  var pages = storyPages();
+  pages.forEach(function(p){
+    var rec = media.aud[p.n];
+    var card = cardBase("aud", p, pages.length);
+    card.appendChild(textLine(p));
+    if(rec){
+      var au = document.createElement("audio");
+      au.controls = true; au.preload = "metadata"; au.src = rec.url;
+      card.appendChild(au);
+    }
+    card.appendChild(cardButtons("aud", p, pages.length, renderGrid6));
+    if(rec){ var nm = document.createElement("div"); nm.className = "mname"; nm.textContent = rec.name + (isFinite(rec.dur) ? " · " + rec.dur.toFixed(1) + "초" : ""); card.appendChild(nm); }
+    grid.appendChild(card);
+  });
+  renderMediaStats();
+}
+function clearAll(kind){
+  var label = kind === "img" ? "그림" : "음성";
+  if(!Object.keys(media[kind]).length) return;
+  if(!confirm("올린 " + label + "을 모두 뺄까요? (컴퓨터의 원본 파일은 그대로 있습니다)")) return;
+  Promise.all(Object.keys(media[kind]).map(function(n){ return removeMedia(kind, parseInt(n, 10)); })).then(function(){
+    statNote[kind] = "";
+    if(kind === "img") renderGrid5(); else renderGrid6();
+  });
+}
+document.getElementById("btnImgMany").addEventListener("click", function(){ var i = document.getElementById("imgMany"); i.value = ""; i.click(); });
+document.getElementById("btnAudMany").addEventListener("click", function(){ var i = document.getElementById("audMany"); i.value = ""; i.click(); });
+document.getElementById("imgMany").addEventListener("change", function(){ if(this.files.length) addMany("img", this.files); });
+document.getElementById("audMany").addEventListener("change", function(){ if(this.files.length) addMany("aud", this.files); });
+document.getElementById("imgOne").addEventListener("change", function(){ if(this.files.length) setOneFromList("img", pickTarget.img, this.files); });
+document.getElementById("audOne").addEventListener("change", function(){ if(this.files.length) setOneFromList("aud", pickTarget.aud, this.files); });
+document.getElementById("btnImgClear").addEventListener("click", function(){ clearAll("img"); });
+document.getElementById("btnAudClear").addEventListener("click", function(){ clearAll("aud"); });
+acceptDropOn(document.getElementById("drop5"), function(files){ addMany("img", files); });
+acceptDropOn(document.getElementById("drop6"), function(files){ addMany("aud", files); });
+/* 카드 밖에 잘못 떨어뜨려도 브라우저가 파일을 열어 버리지 않게 */
+window.addEventListener("dragover", function(e){ if(state.step === 5 || state.step === 6) e.preventDefault(); });
+window.addEventListener("drop", function(e){ if(state.step === 5 || state.step === 6) e.preventDefault(); });
+
+/* ---------- 7단계: 오디오 플립북 ---------- */
+var pf = null;                  /* St.PageFlip */
+var bookPages = [];
+var bookStory = -1;             /* 지금 펼친 쪽: 0 = 표지, 1~N = 본문, N+1 = 뒤표지 */
+var bookPlayer = new Audio();
+var playerK = 0;                /* bookPlayer에 들어 있는 쪽 (-1 = 소리 잠금 해제용) */
+var bookTimers = [];
+var audioUnlocked = false;
+var PRE_PLAY_MS = 450;          /* 책장이 다 넘어간 뒤 읽기 시작까지 */
+var AUTO_NEXT_MS = 1500;        /* 자동 넘김: 다 읽고 다음 쪽으로 가기까지 */
+
+function clearBookTimers(){ bookTimers.forEach(clearTimeout); bookTimers = []; }
+function stopBookAudio(){
+  clearBookTimers();
+  try{ bookPlayer.pause(); }catch(e){}
+  updatePlayBtn();
+}
+function storyOfIndex(idx){   /* 책장 번호 → 쪽: 0 표지, (1,2)=1쪽, (3,4)=2쪽 … */
+  if(idx <= 0) return 0;
+  var k = Math.ceil(idx / 2);
+  return k > bookPages.length ? bookPages.length + 1 : k;
+}
+function makeBookPage(cls, hard){
+  var d = document.createElement("div");
+  d.className = "bpage " + cls;
+  if(hard) d.setAttribute("data-density", "hard");
+  var f = document.createElement("div"); f.className = "fill";
+  d.appendChild(f);
+  return d;
+}
+function sizeBookHost(ratio){
+  var host = document.getElementById("bookHost");
+  var stage = document.getElementById("bookStage");
+  var full = document.fullscreenElement === stage;
+  var availW = stage.clientWidth - (window.innerWidth <= 640 ? 12 : 24);
+  var availH = full ? window.innerHeight - 150 : Math.max(260, window.innerHeight * 0.68);
+  var w = Math.min(availW, availH / ratio * 2);
+  host.style.width = Math.max(200, Math.floor(w)) + "px";
+}
+function fitBookFont(){
+  var host = document.getElementById("bookHost");
+  if(!pf) return;
+  var portrait = pf.getOrientation() === "portrait";
+  var pageW = host.clientWidth / (portrait ? 1 : 2);
+  var px = Math.max(12, Math.min(34, pageW * 0.052));
+  host.style.setProperty("--bfont", px.toFixed(1) + "px");
+}
+function destroyBook(){
+  stopBookAudio();
+  if(pf){ try{ pf.destroy(); }catch(e){} pf = null; }
+  document.getElementById("bookHost").innerHTML = "";
+}
+function ensureBook(){
+  if(bookDirty || !pf){ buildBook(0); }
+  else { updateBookInfo(); }
+}
+function buildBook(startIndex){
+  clearError(7);
+  destroyBook();
+  bookDirty = false;
+  var host = document.getElementById("bookHost");
+  if(typeof St === "undefined" || !St.PageFlip){
+    showError(7, "책장 넘김 기능(page-flip)을 불러오지 못했습니다. 인터넷 연결을 확인하고 새로고침해 주세요.");
+    return;
+  }
+  bookPages = storyPages();
+  if(!bookPages.length){
+    showError(7, "쪽이 없습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 3단계 원고를 먼저 만들어 주세요.");
+    document.getElementById("bookInfo").textContent = "";
+    return;
+  }
+  var ratio = bookRatio();
+  sizeBookHost(ratio);
+  var book = document.createElement("div");
+  host.appendChild(book);
+
+  var cover = makeBookPage("cover", true);
+  var h3 = document.createElement("h3"); h3.textContent = document.getElementById("s1concept").value.trim() || "나의 동화책";
+  var sub = document.createElement("p"); sub.textContent = "책장을 넘기거나 [▶ 소리 듣기]를 누르세요";
+  cover.firstChild.appendChild(h3); cover.firstChild.appendChild(sub);
+  book.appendChild(cover);
+
+  bookPages.forEach(function(p){
+    var rec = media.img[p.n];
+    var pi = makeBookPage(rec ? "image" : "image noimg");
+    if(rec){
+      var im = document.createElement("img");
+      im.src = rec.url; im.alt = p.n + "쪽 그림"; im.draggable = false;
+      im.style.objectPosition = rec.fx + "% " + rec.fy + "%";
+      pi.firstChild.appendChild(im);
+    } else {
+      pi.firstChild.textContent = p.n + "쪽 그림 없음 (5단계에서 올리기)";
+    }
+    book.appendChild(pi);
+    var pt = makeBookPage("text");
+    var tx = document.createElement("div"); tx.textContent = p.text || "";
+    var no = document.createElement("div"); no.className = "pno"; no.textContent = p.n;
+    pt.firstChild.appendChild(tx); pt.firstChild.appendChild(no);
+    book.appendChild(pt);
+  });
+
+  var back = makeBookPage("back", true);
+  var end = document.createElement("h3"); end.textContent = "끝";
+  var again = document.createElement("p"); again.textContent = "[⏮ 처음으로]를 누르면 다시 볼 수 있어요";
+  back.firstChild.appendChild(end); back.firstChild.appendChild(again);
+  book.appendChild(back);
+
+  var w = 500, h = Math.round(500 * ratio);
+  pf = new St.PageFlip(book, {
+    width: w, height: h, size: "stretch",
+    minWidth: 220, maxWidth: 1400, minHeight: Math.round(220 * ratio), maxHeight: Math.round(1400 * ratio),
+    showCover: true, usePortrait: true, drawShadow: true, maxShadowOpacity: 0.5,
+    flippingTime: 800, mobileScrollSupport: false
+  });
+  pf.loadFromHTML(book.querySelectorAll(".bpage"));
+  var quietUntil = Date.now() + 400;   /* 다시 만들 때 쪽 위치를 되돌리는 것은 '넘김'으로 보지 않음 (소리 안 냄) */
+  pf.on("flip", function(e){ onBookFlip(e.data, Date.now() < quietUntil); });
+  pf.on("changeOrientation", function(){ fitBookFont(); });
+  fitBookFont();
+  bookStory = -1;
+  if(startIndex > 0){ try{ pf.turnToPage(startIndex); }catch(e){} }
+  onBookFlip(pf.getCurrentPageIndex(), true);
+}
+function onBookFlip(idx, quiet){
+  var k = storyOfIndex(idx);
+  if(k !== bookStory){
+    bookStory = k;
+    stopBookAudio();
+    if(!quiet && k >= 1 && k <= bookPages.length){
+      bookTimers.push(setTimeout(function(){ playStory(k, true); }, PRE_PLAY_MS));
+    }
+  }
+  updateBookInfo();
+}
+function playStory(k, fromStart){
+  clearBookTimers();
+  var rec = media.aud[k];
+  if(!rec){
+    updateBookInfo();
+    if(document.getElementById("bkAuto").checked) bookTimers.push(setTimeout(goNextStory, 3000));
+    return;
+  }
+  bookPlayer.muted = false;
+  if(playerK !== k){ bookPlayer.src = rec.url; playerK = k; }
+  if(fromStart){ try{ bookPlayer.currentTime = 0; }catch(e){} }
+  var pr = bookPlayer.play();
+  if(pr && pr.catch){
+    pr.catch(function(){
+      updatePlayBtn();
+      document.getElementById("bookInfo").textContent = "브라우저가 소리를 막았습니다. [▶ 소리 듣기]를 눌러 주세요.";
+    });
+  }
+  updatePlayBtn();
+}
+function goNextStory(){
+  if(!pf || bookStory > bookPages.length) return;
+  var target = bookStory < bookPages.length ? 2 * (bookStory + 1) - 1 : 2 * bookPages.length + 1;
+  pf.flip(target);
+}
+function isPlaying(){ return playerK > 0 && !bookPlayer.paused && !bookPlayer.ended; }
+function updatePlayBtn(){
+  var b = document.getElementById("bkPlay");
+  if(b) b.textContent = isPlaying() ? "⏸ 멈춤" : "▶ 소리 듣기";
+}
+function updateBookInfo(){
+  var el = document.getElementById("bookInfo");
+  var n = bookPages.length, k = bookStory;
+  if(!pf || !n){ el.textContent = ""; return; }
+  var auto = document.getElementById("bkAuto").checked ? " · 자동 넘김 켜짐" : "";
+  if(k <= 0) el.textContent = "표지 · [다음 ▶]이나 [▶ 소리 듣기]를 누르면 1쪽부터 읽어 줍니다." + auto;
+  else if(k > n) el.textContent = "끝 · [⏮ 처음으로]를 누르면 다시 볼 수 있어요.";
+  else el.textContent = k + "쪽 / " + n + "쪽" + (media.aud[k] ? "" : " · 이 쪽은 음성이 없습니다 (6단계에서 올리기)") + auto;
+  document.getElementById("bkNext").disabled = k > n;
+  document.getElementById("bkPrev").disabled = k <= 0;
+}
+/* 아이폰 등은 첫 재생이 버튼을 누른 순간에 일어나야 하므로, 처음 누를 때 소리 없이 한 번 재생해 둔다 */
+function unlockAudio(){
+  if(audioUnlocked) return;
+  audioUnlocked = true;
+  var keys = Object.keys(media.aud);
+  if(!keys.length || playerK > 0) return;
+  bookPlayer.muted = true;
+  bookPlayer.src = media.aud[keys[0]].url;
+  playerK = -1;
+  var pr = bookPlayer.play();
+  var done = function(){ if(playerK === -1){ bookPlayer.pause(); playerK = 0; } bookPlayer.muted = false; };
+  if(pr && pr.then) pr.then(done, function(){ bookPlayer.muted = false; playerK = 0; audioUnlocked = false; });
+  else done();
+}
+bookPlayer.addEventListener("play", updatePlayBtn);
+bookPlayer.addEventListener("pause", updatePlayBtn);
+bookPlayer.addEventListener("ended", function(){
+  updatePlayBtn();
+  if(playerK > 0 && document.getElementById("bkAuto").checked) bookTimers.push(setTimeout(goNextStory, AUTO_NEXT_MS));
+});
+document.getElementById("bookStage").addEventListener("pointerdown", unlockAudio, true);
+document.getElementById("bkPlay").addEventListener("click", function(){
+  if(!pf) return;
+  unlockAudio();
+  var k = bookStory, n = bookPages.length;
+  if(k <= 0){ pf.flipNext(); return; }                 /* 표지 → 1쪽을 펼치면 읽기 시작 */
+  if(k > n) return;
+  if(isPlaying()){ bookPlayer.pause(); clearBookTimers(); return; }
+  var resume = playerK === k && bookPlayer.currentTime > 0 && !bookPlayer.ended;
+  playStory(k, !resume);
+});
+document.getElementById("bkReplay").addEventListener("click", function(){
+  unlockAudio();
+  if(bookStory >= 1 && bookStory <= bookPages.length) playStory(bookStory, true);
+});
+document.getElementById("bkPrev").addEventListener("click", function(){ if(pf){ unlockAudio(); pf.flipPrev(); } });
+document.getElementById("bkNext").addEventListener("click", function(){ if(pf){ unlockAudio(); pf.flipNext(); } });
+document.getElementById("bkFirst").addEventListener("click", function(){
+  if(!pf) return;
+  stopBookAudio();
+  pf.turnToPage(0);
+  onBookFlip(0, true);
+});
+document.getElementById("bkAuto").addEventListener("change", function(){
+  updateBookInfo();
+  if(this.checked && !isPlaying() && bookStory >= 1 && bookStory <= bookPages.length && playerK === bookStory && bookPlayer.ended){
+    bookTimers.push(setTimeout(goNextStory, AUTO_NEXT_MS));
+  }
+});
+document.getElementById("bkFull").addEventListener("click", function(){
+  var stage = document.getElementById("bookStage");
+  if(document.fullscreenElement){ document.exitFullscreen(); }
+  else if(stage.requestFullscreen){ stage.requestFullscreen().catch(function(){}); }
+});
+var resizeT = null;
+function rebuildKeepingPage(){
+  if(state.step !== 7 || !pf) return;
+  var idx = pf.getCurrentPageIndex();
+  var wasPlaying = isPlaying();
+  buildBook(idx);
+  if(wasPlaying && bookStory === playerK) playStory(bookStory, false);   /* 읽던 곳부터 이어서 */
+}
+window.addEventListener("resize", function(){ clearTimeout(resizeT); resizeT = setTimeout(rebuildKeepingPage, 250); });
+document.addEventListener("fullscreenchange", function(){
+  document.getElementById("bkFull").textContent = document.fullscreenElement ? "전체 화면 끝내기" : "전체 화면";
+  clearTimeout(resizeT); resizeT = setTimeout(rebuildKeepingPage, 150);
+});
+
+function initMedia(){
+  idbAll().then(function(all){
+    Object.keys(all).forEach(function(key){
+      var m = key.match(/^(img|aud):(\d+)$/);
+      var rec = all[key];
+      if(!m || !rec || !rec.blob) return;
+      rec.url = URL.createObjectURL(rec.blob);
+      media[m[1]][parseInt(m[2], 10)] = rec;
+    });
+  }).catch(function(){ mediaSaved = false; }).then(function(){
+    bookDirty = true;
+    renderGrid5(); renderGrid6();
+    if(state.step === 7) ensureBook();
+  });
+}
+
+/* ---------- 시작 ---------- */
+loadState();
+updateKeyStatus();
+updateS3Summary();
+renderCards2();
+renderCards3();
+renderCards4();
+showStep(state.step);
+initMedia();
+</script>
+</body>
+</html>
