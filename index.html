@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>동화책 프롬프트 생성기 V8 · 오디오 플립북</title>
+<title>동화책 프롬프트 생성기 V8.1 · 오디오 플립북</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTQiIGZpbGw9IiMwRTdDNzQiLz48IS0tIO2OvOy5nCDssYUgLS0+PHBhdGggZD0iTTEyIDIwIFEyMiAxNiAzMiAyMiBMMzIgNTAgUTIyIDQ0IDEyIDQ4IFoiIGZpbGw9IiNGQkY2RUMiLz48cGF0aCBkPSJNNTIgMjAgUTQyIDE2IDMyIDIyIEwzMiA1MCBRNDIgNDQgNTIgNDggWiIgZmlsbD0iI0ZERUJEQyIvPjxwYXRoIGQ9Ik0zMiAyMiBMMzIgNTAiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIi8+PCEtLSDquIDspIQgLS0+PHBhdGggZD0iTTE3IDI4IEwyNyAyNiBNMTcgMzQgTDI3IDMyIE0xNyA0MCBMMjcgMzgiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii42Ii8+PCEtLSDrp4jrspUg67OEIC0tPjxwYXRoIGQ9Ik00MiAyNiBsMi4yIDQuNCA0LjguNy0zLjUgMy40LjggNC44LTQuMy0yLjMtNC4zIDIuMy44LTQuOC0zLjUtMy40IDQuOC0uN3oiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSI0OCIgY3k9IjE0IiByPSIyLjIiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSIxNCIgY3k9IjE0IiByPSIxLjYiIGZpbGw9IiNGREVCREMiLz48L3N2Zz4=">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -355,11 +355,11 @@
   <header class="app-head">
     <div class="headtop">
       <div class="headtitle">
-        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8 · 오디오 플립북</span></h1>
+        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8.1 · 오디오 플립북</span></h1>
       </div>
       <div class="credit">
         made by <b>이경하</b>
-        <span class="claude">Claude 수정 · 2026.11.01</span>
+        <span class="claude">Claude 수정 · 2026.11.09</span>
       </div>
     </div>
     <div class="keybox">
@@ -391,8 +391,8 @@
 
   <div class="steps" id="stepNav">
     <button data-step="1" type="button"><span class="num">1</span>줄거리</button>
-    <button data-step="2" type="button"><span class="num">2</span>에셋</button>
-    <button data-step="3" type="button"><span class="num">3</span>페이지 원고</button>
+    <button data-step="2" type="button"><span class="num">2</span>페이지 원고</button>
+    <button data-step="3" type="button"><span class="num">3</span>에셋</button>
     <button data-step="4" type="button"><span class="num">4</span>장면 프롬프트</button>
     <button data-step="5" type="button"><span class="num">5</span>그림 올리기</button>
     <button data-step="6" type="button"><span class="num">6</span>음성 올리기</button>
@@ -402,7 +402,7 @@
   <!-- 1단계 -->
   <section class="panel" id="panel1">
     <h2>1단계. 줄거리 쓰기</h2>
-    <p class="desc">줄거리는 <b>직접 작성</b>합니다. 아래 칸에 이야기를 쓰거나 붙여넣고, <b>책 분량(페이지 수·페이지당 문장 수)</b>을 정하세요. 분량은 2단계에서 장면(배경)을 몇 개 뽑을지, 3단계에서 원고를 어떻게 나눌지의 기준이 됩니다. 컨셉트·대상·주제는 선택 항목입니다.</p>
+    <p class="desc">줄거리는 <b>직접 작성</b>합니다. 아래 칸에 이야기를 쓰거나 붙여넣고, <b>책 분량(페이지 수·페이지당 문장 수)</b>을 정하세요. 분량은 2단계에서 원고를 몇 쪽으로 나눌지, 3단계에서 장면(배경)을 몇 개 뽑을지의 기준이 됩니다. 컨셉트·대상·주제는 선택 항목입니다.</p>
     <div class="grid3">
       <div class="field">
         <label for="s1concept">컨셉트 <span class="hint">선택</span></label>
@@ -419,7 +419,7 @@
     </div>
     <div class="grid2">
       <div class="field">
-        <label for="s3pages">원고 총 개수 <span class="hint">페이지 수 · 2단계 장면 개수와 3단계 원고 분량의 기준</span></label>
+        <label for="s3pages">원고 총 개수 <span class="hint">페이지 수 · 2단계 원고 분량과 3단계 장면 개수의 기준</span></label>
         <input type="number" id="s3pages" min="1" placeholder="예: 25">
       </div>
       <div class="field">
@@ -439,11 +439,30 @@
     <div class="nav"><span></span><button class="btn ghost" data-go="2" type="button">다음 단계</button></div>
   </section>
 
-  <!-- 2단계 -->
+  <!-- 2단계 (원고) — id는 panel3/s3* 그대로. V8.1에서 에셋(3단계) 앞으로 옮김 -->
+  <section class="panel" id="panel3" hidden>
+    <h2>2단계. 페이지별 원고 만들기</h2>
+    <p class="desc" id="s3summary">1단계에서 정한 분량으로 씁니다.</p>
+    <div class="btnrow">
+      <button class="btn primary" id="btnGen3" type="button">원고 생성</button>
+      <button class="btn ghost small" data-go="1" type="button">분량 바꾸기 (1단계)</button>
+    </div>
+    <div class="error" id="err3"></div>
+    <div class="resulthead">페이지별 원고 카드</div>
+    <div class="cards" id="cards3"></div>
+    <div class="resulthint">아래 원본 표를 직접 고치면 카드도 함께 바뀌고, 다음 단계에도 고친 내용이 사용됩니다.</div>
+    <textarea class="result" id="s3result" placeholder="[원고 생성] 버튼을 누르면 여기에 결과 표가 채워집니다."></textarea>
+    <div class="nav">
+      <button class="btn ghost" data-go="1" type="button">이전 단계</button>
+      <button class="btn ghost" data-go="3" type="button">다음 단계</button>
+    </div>
+  </section>
+
+  <!-- 3단계 (에셋) — id는 panel2/s2* 그대로. V8.1에서 원고(2단계) 뒤로 옮김 -->
   <section class="panel" id="panel2" hidden>
-    <h2>2단계. 에셋 참조 프롬프트 만들기 <span class="tag">핵심</span></h2>
+    <h2>3단계. 에셋 참조 프롬프트 만들기 <span class="tag">핵심</span></h2>
     <p class="desc">
-      동화책 그림에 반복해서 쓰일 <b>에셋</b> 세 종류의 참조 이미지 프롬프트를 만듭니다.
+      2단계 원고를 페이지마다 읽어, 동화책 그림에 반복해서 쓰일 <b>에셋</b> 세 종류의 참조 이미지 프롬프트를 만듭니다.
       <span class="hl char">캐릭터</span>는 여러 번 등장하는 주요 캐릭터만(일관성 유지),
       <span class="hl scene">장면</span>은 이야기에 필요한 배경을 개수 제한 없이 모두,
       <span class="hl prop">도구</span>는 중요한 물건·소품을 뽑습니다.
@@ -479,25 +498,6 @@
     <div class="resulthint">아래 원본 표를 직접 고치면 카드도 함께 바뀌고, 다음 단계에도 고친 내용이 사용됩니다. (열 순서: 종류 | 에셋 이름 | 설명 | 참조 이미지 프롬프트)</div>
     <textarea class="result" id="s2result" placeholder="[에셋 생성] 버튼을 누르면 여기에 결과 표가 채워집니다."></textarea>
     <div class="nav">
-      <button class="btn ghost" data-go="1" type="button">이전 단계</button>
-      <button class="btn ghost" data-go="3" type="button">다음 단계</button>
-    </div>
-  </section>
-
-  <!-- 3단계 -->
-  <section class="panel" id="panel3" hidden>
-    <h2>3단계. 페이지별 원고 만들기</h2>
-    <p class="desc" id="s3summary">1단계에서 정한 분량으로 씁니다.</p>
-    <div class="btnrow">
-      <button class="btn primary" id="btnGen3" type="button">원고 생성</button>
-      <button class="btn ghost small" data-go="1" type="button">분량 바꾸기 (1단계)</button>
-    </div>
-    <div class="error" id="err3"></div>
-    <div class="resulthead">페이지별 원고 카드</div>
-    <div class="cards" id="cards3"></div>
-    <div class="resulthint">아래 원본 표를 직접 고치면 카드도 함께 바뀌고, 다음 단계에도 고친 내용이 사용됩니다.</div>
-    <textarea class="result" id="s3result" placeholder="[원고 생성] 버튼을 누르면 여기에 결과 표가 채워집니다."></textarea>
-    <div class="nav">
       <button class="btn ghost" data-go="2" type="button">이전 단계</button>
       <button class="btn ghost" data-go="4" type="button">다음 단계</button>
     </div>
@@ -507,7 +507,7 @@
   <section class="panel" id="panel4" hidden>
     <h2>4단계. 장면 프롬프트와 사용 에셋</h2>
     <p class="desc">
-      2단계 에셋 표와 3단계 원고를 자동으로 사용합니다. 페이지마다 <b>전체 장면 프롬프트</b>와 그 그림에 들어가는
+      3단계 에셋 표와 2단계 원고를 자동으로 사용합니다. 페이지마다 <b>전체 장면 프롬프트</b>와 그 그림에 들어가는
       <span class="hl char">캐릭터</span>·<span class="hl scene">장면</span>·<span class="hl prop">도구</span> 에셋을 색으로 표시합니다.
       이미지 생성 AI에 프롬프트를 넣을 때 표시된 에셋의 참조 이미지를 함께 첨부하세요.
     </p>
@@ -518,7 +518,7 @@
     <div class="resulthead">장면별 최종 이미지 프롬프트 카드</div>
     <div class="legend">칩을 누르면 그 에셋의 참조 프롬프트가 복사됩니다 ·
       <span class="chip char">캐릭터</span><span class="chip scene">장면</span><span class="chip prop">도구</span>
-      <span class="chip missing">2단계 표에 없음</span>
+      <span class="chip missing">3단계 표에 없음</span>
     </div>
     <div class="cards" id="cards4"></div>
     <div class="resulthint">아래 원본 표를 직접 고치면 카드도 함께 바뀝니다. 카드의 복사 버튼을 누르면 장면 프롬프트 + 첨부할 참조 이미지 안내 + 화풍·크기 태그가 함께 복사됩니다. (열 순서: 페이지 | 사용 에셋 | 장면 프롬프트)</div>
@@ -533,8 +533,8 @@
   <section class="panel" id="panel5" hidden>
     <h2>5단계. 페이지별 그림 올리기</h2>
     <p class="desc">
-      4단계 프롬프트로 이미지 생성 AI(ChatGPT 등)에서 만든 그림을 쪽마다 올립니다. 쪽 수와 원고는 1·3단계 내용을 그대로 씁니다.
-      그림 비율이 2단계 책 크기와 다르면 책 크기에 맞게 잘라서 보여 주며, 자를 위치는 카드의 막대로 옮길 수 있습니다. (원본 파일은 바뀌지 않습니다)
+      4단계 프롬프트로 이미지 생성 AI(ChatGPT 등)에서 만든 그림을 쪽마다 올립니다. 쪽 수와 원고는 1·2단계 내용을 그대로 씁니다.
+      그림 비율이 3단계 책 크기와 다르면 책 크기에 맞게 잘라서 보여 주며, 자를 위치는 카드의 막대로 옮길 수 있습니다. (원본 파일은 바뀌지 않습니다)
     </p>
     <div class="layoutbar tiibox" data-tii="5">
       <span class="lbl">먼저 알려 주세요. 그림에 원고(글)가 이미 들어 있나요?</span>
@@ -622,6 +622,7 @@
       <button class="btn primary" id="btnJsonSave" type="button">작업 내용 JSON으로 저장</button>
       <button class="btn ghost" id="btnJsonLoad" type="button">JSON 파일 불러오기</button>
       <input type="file" id="jsonFile" accept=".json,application/json" hidden>
+      <button class="btn ghost danger" id="btnReset" type="button" title="1~4단계 입력·결과와 5·6단계에 올린 그림·음성을 모두 지우고 처음 상태로 돌립니다 (API 키는 유지)">전체 초기화</button>
     </div>
     <div class="error" id="errJson"></div>
   </div>
@@ -639,8 +640,12 @@
 /* ---------- 상태 저장 ---------- */
 var LS_KEY = "storybookAssetPromptApp_v1";          /* V7부터 별도 저장 공간 (예전 앱과 섞이지 않게) */
 var LS_API_KEY = "storybookPromptApp_apiKey";        /* API 키는 예전 앱과 공유 (사용자 동의 시에만 저장) */
-var APP_VERSION = "V8 오디오 플립북 · Claude 수정 2026.11.01";
+var APP_VERSION = "V8.1 오디오 플립북 · Claude 수정 2026.11.09";
 var LAST_STEP = 7;
+/* 단계 번호 → 패널·결과칸. V8.1에서 2단계(원고)·3단계(에셋) 순서를 바꿨지만,
+   입력칸 id(s2*=에셋, s3*=원고)는 저장 파일 호환을 위해 그대로 둔다 */
+var STEP_PANEL  = { 1:"panel1", 2:"panel3", 3:"panel2", 4:"panel4", 5:"panel5", 6:"panel6", 7:"panel7" };
+var STEP_RESULT = { 1:"s1result", 2:"s3result", 3:"s2result", 4:"s4result" };
 /* 모델 후보: 앞에서부터 시도, 실패하면 다음으로
    - 품질 우선: 최신 Flash → 이전 Flash → Flash-Lite
    - 무료 키 우선: 한도가 넉넉한 편인 Flash-Lite부터 (무료 등급은 3.8 Flash 한도가 매우 작음) */
@@ -685,13 +690,13 @@ function showStep(n){
   if(state.step === 7 && n !== 7) stopBookAudio();
   state.step = n;
   for(var i=1;i<=LAST_STEP;i++){
-    document.getElementById("panel"+i).hidden = (i !== n);
+    document.getElementById(STEP_PANEL[i]).hidden = (i !== n);
   }
   var btns = document.querySelectorAll("#stepNav button");
   btns.forEach(function(b){
     var s = parseInt(b.getAttribute("data-step"),10);
     b.classList.toggle("active", s === n);
-    var resultEl = document.getElementById("s"+s+"result");
+    var resultEl = STEP_RESULT[s] ? document.getElementById(STEP_RESULT[s]) : null;
     b.classList.toggle("done", !!(resultEl && resultEl.value.trim()) && s !== n);
   });
   saveState();
@@ -954,7 +959,7 @@ function typeFromWord(w){
   if(/^(도구|소품|물건|사물|prop|props|item|items|object|objects)$/i.test(w)) return "prop";
   return null;
 }
-/* 2단계 표 한 줄 → {type,name,desc,prompt}. 예전 3열 표(이름|역할|프롬프트)도 캐릭터로 읽음 */
+/* 에셋 표(3단계) 한 줄 → {type,name,desc,prompt}. 예전 3열 표(이름|역할|프롬프트)도 캐릭터로 읽음 */
 function parseAssetRow(cells){
   if(cells.length < 2) return null;
   var t0 = typeFromWord(cells[0]);
@@ -1010,7 +1015,7 @@ function parseUsedAssets(cell, list){
       hadType = true;
       seg.slice(idx+1).split(/[,，、·]/).forEach(function(n){ pushName(type, n); });
     } else if(!hadType){
-      /* 종류 표시가 없는 자유 형식 → 쉼표로 나눠 2단계 표에서 종류를 찾음 */
+      /* 종류 표시가 없는 자유 형식 → 쉼표로 나눠 에셋 표(3단계)에서 종류를 찾음 */
       seg.split(/[,，、·]/).forEach(function(n){ pushName(null, n); });
     }
   });
@@ -1185,7 +1190,7 @@ function renderCards4(){
             });
           });
         } else {
-          c.title = u.isNew ? "2단계 에셋 표에 없는 새 장면입니다. 필요하면 2단계 표에 추가하세요." : "2단계 에셋 표에서 이 이름을 찾지 못했습니다.";
+          c.title = u.isNew ? "3단계 에셋 표에 없는 새 장면입니다. 필요하면 3단계 표에 추가하세요." : "3단계 에셋 표에서 이 이름을 찾지 못했습니다.";
         }
         chips.appendChild(c);
       });
@@ -1233,13 +1238,13 @@ function facesList(){
 }
 function prompt2(){
   var story = document.getElementById("s1result").value.trim();
+  var script = document.getElementById("s3result").value.trim();
   var style = document.getElementById("s2style").value.trim();
   var pages = document.getElementById("s3pages").value.trim();
-  var sent = document.getElementById("s3sent").value.trim();
   var faces = facesList();
   var tl = targetLine();
   return [
-    "아래는 그림동화의 줄거리야. 이 동화책의 그림을 만들 때 참조 이미지로 쓸 '에셋'을 뽑고, 에셋마다 참조 이미지 생성 프롬프트를 만들어줘.",
+    "아래는 그림동화의 줄거리와 페이지별 원고야. 이 동화책의 그림을 만들 때 참조 이미지로 쓸 '에셋'을 뽑고, 에셋마다 참조 이미지 생성 프롬프트를 만들어줘.",
     "에셋은 세 종류야: 캐릭터, 장면(배경), 도구(소품).",
     "목적: 모든 페이지에서 같은 캐릭터·같은 장소·같은 물건으로 보이도록, 참조 이미지를 먼저 만들어 두는 것.",
     "",
@@ -1247,13 +1252,13 @@ function prompt2(){
     story,
     tl ? "\n" + tl : "",
     "",
-    "[책 분량]",
-    "총 " + pages + "페이지, 페이지당 " + sent + "문장. 이 줄거리는 나중에 이 분량의 페이지별 원고로 나뉘고, 페이지마다 그림이 한 장씩 들어가.",
+    "[페이지별 원고 — 총 " + pages + "페이지, 페이지마다 그림이 한 장씩 들어가]",
+    script,
     "",
     "[에셋 선별 규칙]",
-    "1. 캐릭터: 여러 페이지에 반복해서 등장하는 주요 캐릭터만 뽑아. 한 번만 나오는 단역은 제외해. (일관성 유지가 목적)",
-    "2. 장면: 먼저 줄거리를 총 " + pages + "페이지로 나눈다고 생각하고, 각 페이지의 그림에 어떤 배경이 필요한지 머릿속으로 짚어 본 뒤, 그 배경·장소를 빠짐없이 모두 뽑아. 개수 제한 없음. 같은 장소라도 낮/밤, 계절, 날씨, 상태(어질러짐·불탐 등)가 크게 다르면 별도 장면으로 나눠. 모든 페이지가 이 장면 목록 중 하나로 그려질 수 있어야 해.",
-    "3. 도구: 이야기에서 중요한 역할을 하거나 반복 등장하는 물건·소품만 뽑아.",
+    "1. 캐릭터: 여러 페이지에 반복해서 등장하는 주요 캐릭터만 뽑아. 한 번만 나오는 단역은 제외해. (일관성 유지가 목적) 이름은 원고에 쓰인 이름 그대로 써.",
+    "2. 장면: 페이지별 원고를 1페이지부터 끝까지 한 장씩 읽으면서, 그 페이지 그림에 어떤 배경이 필요한지 짚어 본 뒤 그 배경·장소를 빠짐없이 모두 뽑아. 개수 제한 없음. 같은 장소라도 낮/밤, 계절, 날씨, 상태(어질러짐·불탐 등)가 크게 다르면 별도 장면으로 나눠. 모든 페이지가 이 장면 목록 중 하나로 그려질 수 있어야 해. 설명 칸에 그 장면이 쓰이는 페이지 번호를 적어(예: 1~3, 7쪽).",
+    "3. 도구: 이야기에서 중요한 역할을 하거나 반복 등장하는 물건·소품만 뽑아. 이름은 원고에 쓰인 이름 그대로 써.",
     "",
     "[프롬프트 작성 규칙]",
     "- 공통: 각 프롬프트의 맨 앞에 다음 이미지 스타일을 쉼표와 함께 명시해(괄호 밖에): " + style,
@@ -1271,25 +1276,21 @@ function prompt2(){
 }
 function prompt3(){
   var story = document.getElementById("s1result").value.trim();
-  var assets = document.getElementById("s2result").value.trim();
   var pages = document.getElementById("s3pages").value.trim();
   var sent = document.getElementById("s3sent").value.trim();
   var tl = targetLine();
   return [
-    "아래 줄거리와 에셋 표를 바탕으로 그림동화의 페이지별 원고를 써줘.",
+    "아래 줄거리를 바탕으로 그림동화의 페이지별 원고를 써줘.",
     "",
     "[줄거리]",
     story,
     tl ? "\n" + tl : "",
     "",
-    "[에셋 표 — 캐릭터 이름과 장소·물건 이름은 여기 이름을 그대로 써]",
-    assets,
-    "",
     "[작성 규칙]",
     "1. 총 " + pages + "개 페이지로 나눠서 작성해.",
     "2. 페이지당 " + sent + "문장으로 써.",
     "3. 실제 동화책에 인쇄될 글이므로, 캐릭터 이름 앞에 외형 묘사를 반복하지 마. 이름만 자연스럽게 써.",
-    "4. 캐릭터·장소·물건을 부를 때는 에셋 표의 '에셋 이름'을 그대로 써서, 나중에 그림과 짝을 맞추기 쉽게 해.",
+    "4. 캐릭터·장소·물건의 이름은 처음 정한 이름을 끝까지 똑같이 써(별명·줄임말로 바꾸지 마). 다음 단계에서 이 원고를 읽고 그림에 쓸 캐릭터·배경·소품을 뽑으니, 장소가 바뀌는 페이지는 글에서 어디인지 드러나게 써.",
     "5. 대상 독자 연령에 맞는 쉬운 어휘로, 이야기가 자연스럽게 이어지게 써.",
     "6. 표 칸 안에는 | 기호를 쓰지 마.",
     "",
@@ -1368,7 +1369,7 @@ bindGen(1, "btnGen1", "AI로 초안 받기 (선택)", function(){
 bindGen(2, "btnGen2", "에셋 생성", function(){
   if(!document.getElementById("apiKey").value.trim()) return "먼저 Gemini API 키를 입력하세요.";
   if(!document.getElementById("s1result").value.trim()) return "1단계 줄거리가 비어 있습니다. 먼저 줄거리를 써 주세요.";
-  if(!document.getElementById("s3pages").value.trim() || !document.getElementById("s3sent").value.trim()) return "1단계에서 원고 총 개수와 페이지당 문장 수를 먼저 정해 주세요. (장면 개수를 책 분량에 맞추기 위해 필요합니다)";
+  if(!document.getElementById("s3result").value.trim()) return "2단계 원고가 비어 있습니다. 먼저 원고를 만들어 주세요. (원고를 페이지마다 읽고 필요한 배경을 뽑습니다)";
   if(!document.getElementById("s2style").value.trim()) return "원하는 이미지 스타일을 입력해 주세요.";
   return "";
 }, prompt2, "s2result", function(){ renderCards2(); renderCards3(); renderCards4(); });
@@ -1376,24 +1377,23 @@ bindGen(2, "btnGen2", "에셋 생성", function(){
 bindGen(3, "btnGen3", "원고 생성", function(){
   if(!document.getElementById("apiKey").value.trim()) return "먼저 Gemini API 키를 입력하세요.";
   if(!document.getElementById("s1result").value.trim()) return "1단계 줄거리가 비어 있습니다.";
-  if(!document.getElementById("s2result").value.trim()) return "2단계 에셋 표가 비어 있습니다.";
   if(!document.getElementById("s3pages").value.trim() || !document.getElementById("s3sent").value.trim()) return "1단계에서 원고 총 개수와 페이지당 문장 수를 정해 주세요.";
   return "";
 }, prompt3, "s3result", renderCards3);
 
-/* 3단계 머리글에 1단계에서 정한 분량 표시 */
+/* 2단계(원고) 머리글에 1단계에서 정한 분량 표시 */
 function updateS3Summary(){
   var p = document.getElementById("s3pages").value.trim();
   var s = document.getElementById("s3sent").value.trim();
   document.getElementById("s3summary").textContent = (p && s)
-    ? "1단계에서 정한 분량: 총 " + p + "페이지 · 페이지당 " + s + "문장. 2단계 에셋 표의 이름을 그대로 써서 원고를 나눕니다."
+    ? "1단계에서 정한 분량: 총 " + p + "페이지 · 페이지당 " + s + "문장. 줄거리를 이 분량으로 나눠 씁니다. 캐릭터·장소·물건 이름은 한 번 정하면 끝까지 같게 씁니다 (3단계에서 이 원고를 읽고 에셋을 뽑습니다)."
     : "1단계에서 원고 총 개수와 페이지당 문장 수를 아직 정하지 않았습니다. [분량 바꾸기]로 돌아가 정해 주세요.";
 }
 
 bindGen(4, "btnGen4", "장면 생성", function(){
   if(!document.getElementById("apiKey").value.trim()) return "먼저 Gemini API 키를 입력하세요.";
-  if(!document.getElementById("s2result").value.trim()) return "2단계 에셋 표가 비어 있습니다.";
-  if(!document.getElementById("s3result").value.trim()) return "3단계 원고가 비어 있습니다.";
+  if(!document.getElementById("s2result").value.trim()) return "3단계 에셋 표가 비어 있습니다.";
+  if(!document.getElementById("s3result").value.trim()) return "2단계 원고가 비어 있습니다.";
   return "";
 }, prompt4, "s4result", renderCards4);
 
@@ -1609,7 +1609,7 @@ function saveMedia(kind, n){
   });
 }
 
-/* 3단계 원고 표 → [{n, text}] (1단계 원고 총 개수만큼, 원고가 없는 쪽은 빈 글) */
+/* 2단계 원고 표 → [{n, text}] (1단계 원고 총 개수만큼, 원고가 없는 쪽은 빈 글) */
 function storyPages(){
   var rows = dropHeader(parseTableRows(document.getElementById("s3result").value)).filter(function(cells){
     return cells.length >= 2 && cells.slice(1).join("").trim();
@@ -1630,7 +1630,7 @@ function storyPages(){
   for(var i = 1; i <= total; i++) pages.push({ n: i, text: found[i] || "" });
   return pages;
 }
-function bookRatio(){   /* 세로 ÷ 가로 (2단계 크기, 없으면 정사각형) */
+function bookRatio(){   /* 세로 ÷ 가로 (3단계 크기, 없으면 정사각형) */
   var w = parseFloat(document.getElementById("s2w").value) || 0;
   var h = parseFloat(document.getElementById("s2h").value) || 0;
   return (w > 0 && h > 0) ? h / w : 1;
@@ -1714,7 +1714,7 @@ function addMany(kind, fileList){
   var files = Array.prototype.filter.call(fileList, kind === "img" ? isImageFile : isAudioFile);
   var skipped = fileList.length - files.length;
   var total = storyPages().length;
-  if(!total){ showError(step, "쪽 수가 정해지지 않았습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 3단계 원고를 먼저 만들어 주세요."); return; }
+  if(!total){ showError(step, "쪽 수가 정해지지 않았습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 2단계 원고를 먼저 만들어 주세요."); return; }
   if(!files.length){ showError(step, kind === "img" ? "그림 파일이 없습니다." : "음성 파일이 없습니다."); return; }
   var plan = orderFiles(files, total);
   var replacing = plan.list.filter(function(x){ return media[kind][x.n]; }).length;
@@ -1742,7 +1742,7 @@ function renderMediaStats(){
     if(!el) return;
     if(!pages.length){
       el.className = "mstat warn";
-      el.textContent = "쪽 수가 정해지지 않았습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 3단계 원고를 먼저 만들어 주세요.";
+      el.textContent = "쪽 수가 정해지지 않았습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 2단계 원고를 먼저 만들어 주세요.";
       return;
     }
     var have = pages.filter(function(p){ return media[x[0]][p.n]; });
@@ -1817,7 +1817,7 @@ function cardButtons(kind, p, total, rerender){
 }
 function textLine(p){
   var t = document.createElement("div"); t.className = "mtext";
-  t.textContent = p.text || "(3단계 원고 없음)";
+  t.textContent = p.text || "(2단계 원고 없음)";
   return t;
 }
 function renderGrid5(){
@@ -1937,7 +1937,7 @@ function ensureBook(){
   }
   if(!storyPages().length){
     if(viewer){ viewer.destroy(); viewer = null; }
-    showError(7, "쪽이 없습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 3단계 원고를 먼저 만들어 주세요.");
+    showError(7, "쪽이 없습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 2단계 원고를 먼저 만들어 주세요.");
     return;
   }
   if(bookDirty || !viewer){
@@ -2344,7 +2344,7 @@ document.getElementById("bkSave").addEventListener("click", function(){
   var btn = this;
   clearError(7);
   var pages = storyPages();
-  if(!pages.length){ showError(7, "쪽이 없습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 3단계 원고를 먼저 만들어 주세요."); return; }
+  if(!pages.length){ showError(7, "쪽이 없습니다. 1단계에서 원고 총 개수(페이지 수)를 정하거나 2단계 원고를 먼저 만들어 주세요."); return; }
   var noImg = pages.filter(function(p){ return !media.img[p.n]; }).map(function(p){ return p.n; });
   var noAud = pages.filter(function(p){ return !media.aud[p.n]; }).map(function(p){ return p.n; });
   if((noImg.length || noAud.length) && !confirm(
@@ -2386,6 +2386,22 @@ function initMedia(){
     if(state.step === 7) ensureBook();
   });
 }
+
+/* ---------- 전체 초기화 ---------- */
+document.getElementById("btnReset").addEventListener("click", function(){
+  var nImg = Object.keys(media.img).length, nAud = Object.keys(media.aud).length;
+  var msg = "1~4단계의 입력과 결과를 모두 지우고 처음 상태로 돌립니다." +
+            ((nImg || nAud) ? "\n5·6단계에 올린 그림 " + nImg + "개, 음성 " + nAud + "개도 함께 지웁니다. (컴퓨터의 원본 파일은 그대로 있습니다)" : "") +
+            "\n\nAPI 키와 모델 선택은 유지됩니다. 되돌릴 수 없습니다. 계속할까요?";
+  if(!confirm(msg)) return;
+  var pref = modelPref();
+  var jobs = Object.keys(media.img).map(function(n){ return removeMedia("img", parseInt(n, 10)); })
+    .concat(Object.keys(media.aud).map(function(n){ return removeMedia("aud", parseInt(n, 10)); }));
+  Promise.all(jobs).catch(function(){}).then(function(){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify({ step: 1, modelPref: pref })); }catch(e){}
+    location.reload();   /* 새로 읽어 1~7단계 화면을 모두 빈 상태로 */
+  });
+});
 
 /* ---------- 시작 ---------- */
 loadState();
