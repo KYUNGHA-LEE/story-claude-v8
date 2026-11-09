@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>동화책 프롬프트 생성기 V8.1 · 오디오 플립북</title>
+<title>동화책 프롬프트 생성기 V8.2 · 오디오 플립북</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTQiIGZpbGw9IiMwRTdDNzQiLz48IS0tIO2OvOy5nCDssYUgLS0+PHBhdGggZD0iTTEyIDIwIFEyMiAxNiAzMiAyMiBMMzIgNTAgUTIyIDQ0IDEyIDQ4IFoiIGZpbGw9IiNGQkY2RUMiLz48cGF0aCBkPSJNNTIgMjAgUTQyIDE2IDMyIDIyIEwzMiA1MCBRNDIgNDQgNTIgNDggWiIgZmlsbD0iI0ZERUJEQyIvPjxwYXRoIGQ9Ik0zMiAyMiBMMzIgNTAiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIi8+PCEtLSDquIDspIQgLS0+PHBhdGggZD0iTTE3IDI4IEwyNyAyNiBNMTcgMzQgTDI3IDMyIE0xNyA0MCBMMjcgMzgiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii42Ii8+PCEtLSDrp4jrspUg67OEIC0tPjxwYXRoIGQ9Ik00MiAyNiBsMi4yIDQuNCA0LjguNy0zLjUgMy40LjggNC44LTQuMy0yLjMtNC4zIDIuMy44LTQuOC0zLjUtMy40IDQuOC0uN3oiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSI0OCIgY3k9IjE0IiByPSIyLjIiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSIxNCIgY3k9IjE0IiByPSIxLjYiIGZpbGw9IiNGREVCREMiLz48L3N2Zz4=">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -269,6 +269,7 @@
     border:1px solid var(--teal);border-radius:6px;color:var(--teal-dark);
     font-size:0.78rem;font-weight:700;padding:3px 10px;
   }
+  .ccard.scene .finaltag{background:var(--orange-soft);border-color:var(--orange);color:var(--orange-dark);}
   .refline{
     margin-top:8px;font-size:0.78rem;color:var(--muted);
     background:#fff;border:1px dashed var(--line);border-radius:6px;padding:6px 10px;
@@ -355,7 +356,7 @@
   <header class="app-head">
     <div class="headtop">
       <div class="headtitle">
-        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8.1 · 오디오 플립북</span></h1>
+        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8.2 · 오디오 플립북</span></h1>
       </div>
       <div class="credit">
         made by <b>이경하</b>
@@ -489,6 +490,7 @@
       <button class="btn primary" id="btnGen2" type="button">에셋 생성</button>
     </div>
     <div class="error" id="err2"></div>
+    <div class="notice"><b>크기</b> 위의 가로·세로는 책 한 쪽의 크기입니다. <span class="hl scene">장면</span>(배경) 참조 프롬프트와 4단계 최종 프롬프트를 복사할 때 이 크기와 비율(예: 1:1 정사각형)이 자동으로 붙어, 배경 그림이 책 쪽과 같은 비율로 나옵니다. 캐릭터 시트와 도구는 흰 배경의 참조용이라 붙이지 않습니다.</div>
     <div class="notice"><b>사용 팁</b> 각 에셋 프롬프트로 참조 이미지를 1장씩 먼저 만들어 두세요. 캐릭터는 <b>앞·옆·뒤 전신과 표정 여러 개가 한 장에 담긴 캐릭터 시트</b>로 나오므로, 장면에서 뒷모습이나 다른 표정이 필요할 때도 같은 시트 한 장을 첨부하면 됩니다. 4단계 장면 프롬프트를 쓸 때 그 페이지에 쓰이는 캐릭터·장면·도구 참조 이미지를 함께 첨부하면, 캐릭터뿐 아니라 배경과 물건의 일관성도 유지됩니다.</div>
     <div class="resulthead">에셋 카드</div>
     <div class="legend">종류별 색:
@@ -640,7 +642,7 @@
 /* ---------- 상태 저장 ---------- */
 var LS_KEY = "storybookAssetPromptApp_v1";          /* V7부터 별도 저장 공간 (예전 앱과 섞이지 않게) */
 var LS_API_KEY = "storybookPromptApp_apiKey";        /* API 키는 예전 앱과 공유 (사용자 동의 시에만 저장) */
-var APP_VERSION = "V8.1 오디오 플립북 · Claude 수정 2026.11.09";
+var APP_VERSION = "V8.2 오디오 플립북 · Claude 수정 2026.11.09";
 var LAST_STEP = 7;
 /* 단계 번호 → 패널·결과칸. V8.1에서 2단계(원고)·3단계(에셋) 순서를 바꿨지만,
    입력칸 id(s2*=에셋, s3*=원고)는 저장 파일 호환을 위해 그대로 둔다 */
@@ -1107,7 +1109,12 @@ function renderCards2(){
       card.appendChild(n);
       if(a.desc){ var r = document.createElement("div"); r.className = "crole"; r.textContent = a.desc; card.appendChild(r); }
       card.appendChild(p);
-      card.appendChild(makeCopyBtn(function(){ return a.prompt; }));
+      if(type === "scene"){   /* 배경은 책 쪽과 같은 비율이어야 하므로 크기 줄을 붙여 보여 주고 복사에도 넣는다 */
+        var st = document.createElement("div"); st.className = "finaltag"; st.textContent = sceneSizeTag();
+        st.title = "3단계 위의 이미지 가로·세로에서 자동으로 만들어집니다. 복사할 때 프롬프트 끝에 붙습니다.";
+        card.appendChild(st);
+      }
+      card.appendChild(makeCopyBtn(function(){ return assetCopyText(a); }));
       box.appendChild(card);
     });
   });
@@ -1132,11 +1139,34 @@ function renderCards3(){
     box.appendChild(card);
   });
 }
+/* 책 한 쪽 크기 → "가로 210mm × 세로 210mm (비율 1:1, 정사각형)". 비율은 이미지 생성기가 실제로 보는 값이라 함께 적는다 */
+function sizeText(){
+  var w = document.getElementById("s2w").value.trim();
+  var h = document.getElementById("s2h").value.trim();
+  var txt = "가로 " + (w || "??") + "mm × 세로 " + (h || "??") + "mm";
+  var wn = parseFloat(w), hn = parseFloat(h);
+  if(wn > 0 && hn > 0){
+    var a = Math.round(wn), b = Math.round(hn);
+    var x = a, y = b; while(y){ var t = y; y = x % y; x = t; }   /* 최대공약수 */
+    var rw = a / (x || 1), rh = b / (x || 1);
+    var ratio = (rw <= 20 && rh <= 20) ? rw + ":" + rh                      /* 1:1, 4:3, 16:9 처럼 흔한 비율 */
+              : (wn >= hn ? "약 " + (wn / hn).toFixed(2) + ":1" : "약 1:" + (hn / wn).toFixed(2));   /* A4(210×297) → 약 1:1.41 */
+    var shape = Math.abs(wn - hn) < 0.5 ? "정사각형" : (wn > hn ? "가로형" : "세로형");
+    txt += " (비율 " + ratio + ", " + shape + ")";
+  }
+  return txt;
+}
+/* 3단계 장면(배경) 카드·복사용 크기 줄 */
+function sceneSizeTag(){
+  return "[크기: " + sizeText() + " — 동화책 한 쪽과 같은 비율의 배경 그림으로]";
+}
+/* 에셋 카드·칩에서 복사되는 글: 장면이면 크기 줄을 붙인다 */
+function assetCopyText(a){
+  return a.type === "scene" ? a.prompt + "\n" + sceneSizeTag() : a.prompt;
+}
 function finalTag(){
   var style = document.getElementById("s2style").value.trim() || "(이미지 스타일 미입력)";
-  var w = document.getElementById("s2w").value.trim() || "??";
-  var h = document.getElementById("s2h").value.trim() || "??";
-  return "[화풍: " + style + ", 크기: 가로 " + w + "mm × 세로 " + h + "mm]";
+  return "[화풍: " + style + ", 크기: " + sizeText() + "]";
 }
 /* 복사용: 첨부할 참조 이미지 안내문 */
 function refLine(used){
@@ -1182,9 +1212,9 @@ function renderCards4(){
         c.appendChild(k);
         c.appendChild(document.createTextNode((u.isNew ? "(신규) " : "") + u.name));
         if(u.asset){
-          c.title = "누르면 이 에셋의 참조 프롬프트를 복사합니다\n" + u.asset.prompt;
+          c.title = "누르면 이 에셋의 참조 프롬프트를 복사합니다\n" + assetCopyText(u.asset);
           c.addEventListener("click", function(){
-            copyText(u.asset.prompt, function(){
+            copyText(assetCopyText(u.asset), function(){
               c.classList.add("copied");
               setTimeout(function(){ c.classList.remove("copied"); }, 1200);
             });
@@ -1243,6 +1273,12 @@ function prompt2(){
   var pages = document.getElementById("s3pages").value.trim();
   var faces = facesList();
   var tl = targetLine();
+  var w = parseFloat(document.getElementById("s2w").value), h = parseFloat(document.getElementById("s2h").value);
+  var frame = (w > 0 && h > 0)
+    ? " 이 배경 그림은 동화책 한 쪽 크기인 " + sizeText() + "로 만들어지니 그 틀에 맞는 구도로 써 — " +
+      (Math.abs(w - h) < 0.5 ? "정사각형이라 위아래·좌우를 고르게 채우는 구도" : (w > h ? "가로가 길어 좌우로 넓게 펼쳐지는 구도" : "세로가 길어 위아래(하늘·땅, 높이)를 살리는 구도")) +
+      ". 크기·비율 숫자 자체는 프롬프트에 쓰지 마(복사할 때 자동으로 붙어)."
+    : "";
   return [
     "아래는 그림동화의 줄거리와 페이지별 원고야. 이 동화책의 그림을 만들 때 참조 이미지로 쓸 '에셋'을 뽑고, 에셋마다 참조 이미지 생성 프롬프트를 만들어줘.",
     "에셋은 세 종류야: 캐릭터, 장면(배경), 도구(소품).",
@@ -1264,7 +1300,7 @@ function prompt2(){
     "- 공통: 각 프롬프트의 맨 앞에 다음 이미지 스타일을 쉼표와 함께 명시해(괄호 밖에): " + style,
     "- 공통: '귀여운', '예쁜'처럼 모호한 표현 금지. 색(구체적인 색이름)·모양·크기·재질을 전부 구체적인 단어로 써. 괄호 ( ) 안에는 화풍·스타일 표현을 넣지 말고 오직 고정할 외형 정보만 넣어.",
     "- 캐릭터: 한 장의 '캐릭터 시트(character design sheet, turnaround)'로 만들어. 한 이미지 안에 같은 캐릭터를 이렇게 배치해 — 윗줄: 전신 정면(front view), 전신 옆모습(side view, 왼쪽 프로필), 전신 뒷모습(back view)을 같은 크기·같은 중립 자세(두 팔을 자연스럽게 내리고 똑바로 선 자세)로 나란히 / 아랫줄: 얼굴 클로즈업 표정 " + faces.length + "개(" + faces.join(", ") + "). 프롬프트 본문에 이 배치를 영어 키워드로도 함께 써(예: 'character design sheet, full body turnaround: front view, side view, back view, same scale; expression sheet: ...'). 괄호 ( ) 안에 초상세 외형 고정 명세를 써. 항목 전부: 종/정체, 나이·성별 느낌, 체형·비율(머리:몸 비율), 피부/털 색·질감·무늬, 얼굴형, 눈(모양·크기·색), 코·입 모양, 귀/머리카락(모양·색), 시그니처 포인트 1~2개(어떤 장면에서도 변하지 않는 표식), 상의·하의·신발(종류·색·무늬), 액세서리, 대표 색 팔레트 2~3개. 문장 끝에 '모든 뷰와 표정에서 같은 캐릭터로 일관성 유지(consistent character), 화이트 배경, 글자·라벨 없음(no text, no labels)'을 쉼표와 함께 붙여.",
-    "- 장면: 캐릭터가 전혀 없는 빈 배경으로. 공간 전체 구조가 보이는 넓은 전경(와이드 샷). 괄호 ( ) 안에 고정 명세: 장소 종류, 공간 구조와 주요 사물 배치(왼쪽/가운데/오른쪽/앞/뒤), 핵심 지형지물 2~3개(어떤 페이지에서도 변하지 않는 표식), 색 팔레트, 시간대·조명·날씨, 분위기. 문장 끝에 '캐릭터 없음, 텍스트 없음'을 쉼표와 함께 붙여.",
+    "- 장면: 캐릭터가 전혀 없는 빈 배경으로. 공간 전체 구조가 보이는 넓은 전경(와이드 샷). 괄호 ( ) 안에 고정 명세: 장소 종류, 공간 구조와 주요 사물 배치(왼쪽/가운데/오른쪽/앞/뒤), 핵심 지형지물 2~3개(어떤 페이지에서도 변하지 않는 표식), 색 팔레트, 시간대·조명·날씨, 분위기. 문장 끝에 '캐릭터 없음, 텍스트 없음'을 쉼표와 함께 붙여." + frame,
     "- 도구: 물건 하나만 단독으로. 괄호 ( ) 안에 고정 명세: 종류, 크기 느낌(손에 쥐는 크기 등), 형태, 재질, 색, 무늬·장식, 시그니처 디테일 1~2개. 정면 또는 비스듬한 3/4 시점. 문장 끝에 '물건 단독, 화이트 배경'을 쉼표와 함께 붙여.",
     "- 표 칸 안에는 | 기호를 쓰지 마. 설명 칸은 한 줄로 짧게(어떤 역할인지, 어느 대목에 나오는지).",
     "",
@@ -1466,6 +1502,7 @@ fieldIds.forEach(function(id){
     if(id === "s3result") renderCards3();
     if(id === "s4result") renderCards4();
     if(id === "s2style" || id === "s2w" || id === "s2h") renderCards4();
+    if(id === "s2w" || id === "s2h") renderCards2();   /* 장면 카드의 크기 줄 */
     if(id === "s3pages" || id === "s3sent") updateS3Summary();
     if(id === "s1concept" || id === "s2w" || id === "s2h" || id === "s3pages" || id === "s3result") bookDirty = true;
   });
