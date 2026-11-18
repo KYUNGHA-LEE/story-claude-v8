@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>동화책 프롬프트 생성기 V8.3 · 오디오 플립북</title>
+<title>동화책 프롬프트 생성기 V8.4 · 오디오 플립북</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTQiIGZpbGw9IiMwRTdDNzQiLz48IS0tIO2OvOy5nCDssYUgLS0+PHBhdGggZD0iTTEyIDIwIFEyMiAxNiAzMiAyMiBMMzIgNTAgUTIyIDQ0IDEyIDQ4IFoiIGZpbGw9IiNGQkY2RUMiLz48cGF0aCBkPSJNNTIgMjAgUTQyIDE2IDMyIDIyIEwzMiA1MCBRNDIgNDQgNTIgNDggWiIgZmlsbD0iI0ZERUJEQyIvPjxwYXRoIGQ9Ik0zMiAyMiBMMzIgNTAiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIi8+PCEtLSDquIDspIQgLS0+PHBhdGggZD0iTTE3IDI4IEwyNyAyNiBNMTcgMzQgTDI3IDMyIE0xNyA0MCBMMjcgMzgiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii42Ii8+PCEtLSDrp4jrspUg67OEIC0tPjxwYXRoIGQ9Ik00MiAyNiBsMi4yIDQuNCA0LjguNy0zLjUgMy40LjggNC44LTQuMy0yLjMtNC4zIDIuMy44LTQuOC0zLjUtMy40IDQuOC0uN3oiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSI0OCIgY3k9IjE0IiByPSIyLjIiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSIxNCIgY3k9IjE0IiByPSIxLjYiIGZpbGw9IiNGREVCREMiLz48L3N2Zz4=">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -281,6 +281,18 @@
     background:var(--card);padding:18px 22px;text-align:center;
   }
   .savebar p{font-size:0.85rem;color:var(--muted);margin-bottom:10px;}
+
+  /* 창을 닫으려 할 때 뜨는 JSON 저장 안내 (V8.4) */
+  .leavedlg{
+    border:2px solid var(--orange);border-radius:14px;background:var(--card);color:var(--ink);
+    padding:24px 26px;margin:auto;width:460px;max-width:calc(100vw - 32px);text-align:center;
+    box-shadow:0 18px 50px rgba(43,42,38,.28);
+  }
+  .leavedlg::backdrop{background:rgba(43,42,38,.55);}
+  .leavedlg h2{font-size:1.15rem;font-weight:900;color:var(--orange-dark);margin-bottom:10px;}
+  .leavedlg p{font-size:0.9rem;margin-bottom:8px;word-break:keep-all;overflow-wrap:anywhere;}
+  .leavedlg p.sub{font-size:0.8rem;color:var(--muted);}
+  .leavedlg .btnrow{justify-content:center;margin-top:16px;}
   footer{
     text-align:center;color:var(--muted);font-size:0.75rem;margin-top:26px;
   }
@@ -364,11 +376,11 @@
   <header class="app-head">
     <div class="headtop">
       <div class="headtitle">
-        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8.3 · 오디오 플립북</span></h1>
+        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8.4 · 오디오 플립북</span></h1>
       </div>
       <div class="credit">
         made by <b>이경하</b>
-        <span class="claude">Claude 수정 · 2026.11.10</span>
+        <span class="claude">Claude 수정 · 2026.11.18</span>
       </div>
     </div>
     <div class="keybox">
@@ -641,6 +653,16 @@
   <footer>모든 입력과 결과, 올린 그림과 음성은 이 컴퓨터의 브라우저에 자동 저장되어, 새로고침해도 유지됩니다. 그림과 음성은 서버로 보내지 않습니다.</footer>
 </div>
 
+<dialog class="leavedlg" id="leaveDlg" aria-labelledby="leaveDlgTitle">
+  <h2 id="leaveDlgTitle"></h2>
+  <p id="leaveDlgMsg"></p>
+  <p class="sub" id="leaveDlgSub"></p>
+  <div class="btnrow">
+    <button class="btn primary" id="leaveDlgSave" type="button">작업 내용 JSON으로 저장</button>
+    <button class="btn ghost" id="leaveDlgClose" type="button">나중에 하기</button>
+  </div>
+</dialog>
+
 <button class="floatnav prev" id="floatPrev" type="button" title="이전 단계" aria-label="이전 단계">◀<span class="lbl">이전</span></button>
 <button class="floatnav next" id="floatNext" type="button" title="다음 단계" aria-label="다음 단계">▶<span class="lbl">다음</span></button>
 
@@ -651,7 +673,7 @@
 /* ---------- 상태 저장 ---------- */
 var LS_KEY = "storybookAssetPromptApp_v1";          /* V7부터 별도 저장 공간 (예전 앱과 섞이지 않게) */
 var LS_API_KEY = "storybookPromptApp_apiKey";        /* API 키는 예전 앱과 공유 (사용자 동의 시에만 저장) */
-var APP_VERSION = "V8.3 오디오 플립북 · Claude 수정 2026.11.10";
+var APP_VERSION = "V8.4 오디오 플립북 · Claude 수정 2026.11.18";
 var LAST_STEP = 7;
 /* 단계 번호 → 패널·결과칸. V8.1에서 2단계(원고)·3단계(에셋) 순서를 바꿨지만,
    입력칸 id(s2*=에셋, s3*=원고)는 저장 파일 호환을 위해 그대로 둔다 */
@@ -1542,9 +1564,8 @@ function stamp(){
   var d = new Date();
   return d.getFullYear() + pad2(d.getMonth()+1) + pad2(d.getDate()) + "_" + pad2(d.getHours()) + pad2(d.getMinutes());
 }
-document.getElementById("btnJsonSave").addEventListener("click", function(){
+function saveJsonFile(){   /* 받은 파일 이름을 돌려준다 */
   clearJsonError();
-  saveState();
   var data = { app: "storybook-prompt-generator", version: APP_VERSION, savedAt: new Date().toISOString(), step: state.step, fields: {} };
   fieldIds.forEach(function(id){ data.fields[id] = document.getElementById(id).value; });  /* apiKey 제외 */
   var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -1554,7 +1575,11 @@ document.getElementById("btnJsonSave").addEventListener("click", function(){
   a.download = title + "_" + stamp() + ".json";
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(a.href);
-});
+  state.jsonSig = fieldsSig();   /* 지금 내용은 파일로 받았다고 기억 → 창을 닫을 때 다시 묻지 않는다 */
+  saveState();
+  return a.download;
+}
+document.getElementById("btnJsonSave").addEventListener("click", function(){ saveJsonFile(); });
 document.getElementById("btnJsonLoad").addEventListener("click", function(){
   clearJsonError();
   document.getElementById("jsonFile").value = "";
@@ -1576,6 +1601,7 @@ document.getElementById("jsonFile").addEventListener("change", function(){
         if(fields[id] !== undefined && fields[id] !== null){ document.getElementById(id).value = String(fields[id]); count++; }
       });
       if(!count) throw new Error("이 앱의 작업 파일이 아닙니다.");
+      if(count === fieldIds.length) state.jsonSig = fieldsSig();   /* 화면이 파일과 같으니 "저장됨"으로 */
       saveState();
       renderCards2(); renderCards3(); renderCards4();
       bookDirty = true;
@@ -1588,6 +1614,52 @@ document.getElementById("jsonFile").addEventListener("change", function(){
   };
   reader.onerror = function(){ showJsonError("파일을 읽는 중 오류가 발생했습니다."); };
   reader.readAsText(file, "utf-8");
+});
+
+/* ---------- 창을 닫기 전에: JSON 저장 안내 (V8.4) ----------
+   1~4단계 내용이 마지막으로 JSON을 받거나 불러온 때와 다르면, 창을 닫거나 새로고침할 때 브라우저의
+   "나가시겠습니까?" 확인창이 뜬다. 그 창의 문구는 브라우저가 정하므로(바꿀 수 없음),
+   [취소]를 눌러 머무르면 바로 아래의 저장 안내 창을 띄워 JSON 저장 버튼을 내민다. */
+var skipLeaveWarn = false;   /* 전체 초기화처럼 스스로 새로 읽을 때는 묻지 않는다 */
+function fieldsSig(){        /* 1~4단계 입력·결과 전체의 지문 (길이:해시) */
+  var s = fieldIds.map(function(id){ var el = document.getElementById(id); return el ? el.value : ""; }).join("\u0001");
+  var h = 5381;
+  for(var i = 0; i < s.length; i++){ h = ((h << 5) + h + s.charCodeAt(i)) | 0; }
+  return s.length + ":" + h;
+}
+function needsJsonSave(){
+  var hasWork = fieldIds.some(function(id){ return document.getElementById(id).value.trim(); });
+  return hasWork && state.jsonSig !== fieldsSig();
+}
+function setLeaveDlg(savedName){
+  var done = !!savedName;
+  document.getElementById("leaveDlgTitle").textContent = done ? "저장했습니다" : "잠깐! 작업 내용을 파일로 저장하셨나요?";
+  document.getElementById("leaveDlgMsg").textContent = done
+    ? "받은 파일: " + savedName
+    : "아직 JSON 파일로 저장하지 않은 작업이 있습니다. 창을 닫기 전에 파일로 저장해 두세요.";
+  document.getElementById("leaveDlgSub").textContent = done
+    ? "다운로드 폴더에서 파일을 확인한 뒤 창을 닫으세요. (5·6단계에 올린 그림과 음성은 JSON에 들어가지 않습니다)"
+    : "이 브라우저에는 자동으로 보관되지만, 다른 컴퓨터나 브라우저에서는 이어서 할 수 없고 브라우저의 사이트 데이터를 지우면 사라집니다.";
+  document.getElementById("leaveDlgSave").hidden = done;
+  document.getElementById("leaveDlgClose").textContent = done ? "확인" : "나중에 하기";
+}
+function openLeaveDlg(){
+  var dlg = document.getElementById("leaveDlg");
+  if(typeof dlg.showModal !== "function"){   /* 아주 오래된 브라우저 */
+    if(confirm("아직 JSON 파일로 저장하지 않은 작업이 있습니다.\n지금 JSON 파일로 저장할까요?")) saveJsonFile();
+    return;
+  }
+  if(dlg.open) return;
+  setLeaveDlg("");
+  dlg.showModal();
+}
+document.getElementById("leaveDlgSave").addEventListener("click", function(){ setLeaveDlg(saveJsonFile()); });
+document.getElementById("leaveDlgClose").addEventListener("click", function(){ document.getElementById("leaveDlg").close(); });
+window.addEventListener("beforeunload", function(e){
+  if(skipLeaveWarn || !needsJsonSave()) return;
+  e.preventDefault();
+  e.returnValue = "작업 내용을 아직 JSON 파일로 저장하지 않았습니다.";   /* 요즘 브라우저는 이 문구 대신 자체 안내문을 보여 준다 */
+  setTimeout(openLeaveDlg, 300);   /* 확인창이 떠 있는 동안은 멈춰 있다가, 머무르기로 했을 때만 실행된다 */
 });
 
 /* ---------- 좌우 플로팅 이동 버튼 ---------- */
@@ -2542,6 +2614,7 @@ document.getElementById("btnReset").addEventListener("click", function(){
     .concat(Object.keys(media.aud).map(function(n){ return removeMedia("aud", parseInt(n, 10)); }));
   Promise.all(jobs).catch(function(){}).then(function(){
     try{ localStorage.setItem(LS_KEY, JSON.stringify({ step: 1, modelPref: pref })); }catch(e){}
+    skipLeaveWarn = true;   /* 이미 "모두 지운다"에 동의했으니 나가기 확인은 묻지 않는다 */
     location.reload();   /* 새로 읽어 1~7단계 화면을 모두 빈 상태로 */
   });
 });
