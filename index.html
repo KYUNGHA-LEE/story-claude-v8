@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>동화책 프롬프트 생성기 V8.4 · 오디오 플립북</title>
+<title>동화책 프롬프트 생성기 V8.5 · 오디오 플립북</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTQiIGZpbGw9IiMwRTdDNzQiLz48IS0tIO2OvOy5nCDssYUgLS0+PHBhdGggZD0iTTEyIDIwIFEyMiAxNiAzMiAyMiBMMzIgNTAgUTIyIDQ0IDEyIDQ4IFoiIGZpbGw9IiNGQkY2RUMiLz48cGF0aCBkPSJNNTIgMjAgUTQyIDE2IDMyIDIyIEwzMiA1MCBRNDIgNDQgNTIgNDggWiIgZmlsbD0iI0ZERUJEQyIvPjxwYXRoIGQ9Ik0zMiAyMiBMMzIgNTAiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIi8+PCEtLSDquIDspIQgLS0+PHBhdGggZD0iTTE3IDI4IEwyNyAyNiBNMTcgMzQgTDI3IDMyIE0xNyA0MCBMMjcgMzgiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii42Ii8+PCEtLSDrp4jrspUg67OEIC0tPjxwYXRoIGQ9Ik00MiAyNiBsMi4yIDQuNCA0LjguNy0zLjUgMy40LjggNC44LTQuMy0yLjMtNC4zIDIuMy44LTQuOC0zLjUtMy40IDQuOC0uN3oiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSI0OCIgY3k9IjE0IiByPSIyLjIiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSIxNCIgY3k9IjE0IiByPSIxLjYiIGZpbGw9IiNGREVCREMiLz48L3N2Zz4=">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -281,6 +281,8 @@
     background:var(--card);padding:18px 22px;text-align:center;
   }
   .savebar p{font-size:0.85rem;color:var(--muted);margin-bottom:10px;}
+  .jsonnote{font-size:0.82rem;font-weight:700;color:var(--teal-dark);margin-top:10px;word-break:keep-all;overflow-wrap:anywhere;}
+  .jsonnote:empty{display:none;}
 
   /* 창을 닫으려 할 때 뜨는 JSON 저장 안내 (V8.4) */
   .leavedlg{
@@ -376,11 +378,11 @@
   <header class="app-head">
     <div class="headtop">
       <div class="headtitle">
-        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8.4 · 오디오 플립북</span></h1>
+        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8.5 · 오디오 플립북</span></h1>
       </div>
       <div class="credit">
         made by <b>이경하</b>
-        <span class="claude">Claude 수정 · 2026.11.18</span>
+        <span class="claude">Claude 수정 · 2026.11.19</span>
       </div>
     </div>
     <div class="keybox">
@@ -639,14 +641,15 @@
   </section>
 
   <div class="savebar" style="border-color:var(--teal);">
-    <p>1~4단계의 입력과 결과를 JSON 파일로 저장해 두면, 다른 컴퓨터나 브라우저에서 불러와 이어서 작업할 수 있습니다. (API 키는 저장되지 않습니다)<br>
-    5·6단계에서 올린 그림과 음성은 JSON에 들어가지 않고 이 브라우저에만 보관됩니다. 다른 컴퓨터에서는 다시 올려 주세요.</p>
+    <p>1~4단계의 입력과 결과, 6단계에서 올린 음성을 JSON 파일로 저장해 두면, 다른 컴퓨터나 브라우저에서 불러와 이어서 작업할 수 있습니다. (API 키는 저장되지 않습니다)<br>
+    5단계에서 올린 그림은 JSON에 들어가지 않고 이 브라우저에만 보관됩니다. 다른 컴퓨터에서는 그림을 다시 올려 주세요.</p>
     <div class="btnrow" style="justify-content:center;">
       <button class="btn primary" id="btnJsonSave" type="button">작업 내용 JSON으로 저장</button>
       <button class="btn ghost" id="btnJsonLoad" type="button">JSON 파일 불러오기</button>
       <input type="file" id="jsonFile" accept=".json,application/json" hidden>
       <button class="btn ghost danger" id="btnReset" type="button" title="1~4단계 입력·결과와 5·6단계에 올린 그림·음성을 모두 지우고 처음 상태로 돌립니다 (API 키는 유지)">전체 초기화</button>
     </div>
+    <div class="jsonnote" id="jsonNote" role="status"></div>
     <div class="error" id="errJson"></div>
   </div>
 
@@ -673,7 +676,7 @@
 /* ---------- 상태 저장 ---------- */
 var LS_KEY = "storybookAssetPromptApp_v1";          /* V7부터 별도 저장 공간 (예전 앱과 섞이지 않게) */
 var LS_API_KEY = "storybookPromptApp_apiKey";        /* API 키는 예전 앱과 공유 (사용자 동의 시에만 저장) */
-var APP_VERSION = "V8.4 오디오 플립북 · Claude 수정 2026.11.18";
+var APP_VERSION = "V8.5 오디오 플립북 · Claude 수정 2026.11.19";
 var LAST_STEP = 7;
 /* 단계 번호 → 패널·결과칸. V8.1에서 2단계(원고)·3단계(에셋) 순서를 바꿨지만,
    입력칸 id(s2*=에셋, s3*=원고)는 저장 파일 호환을 위해 그대로 둔다 */
@@ -1564,22 +1567,117 @@ function stamp(){
   var d = new Date();
   return d.getFullYear() + pad2(d.getMonth()+1) + pad2(d.getDate()) + "_" + pad2(d.getHours()) + pad2(d.getMinutes());
 }
-function saveJsonFile(){   /* 받은 파일 이름을 돌려준다 */
-  clearJsonError();
+function setJsonNote(msg){   /* 저장·불러오기 결과 한 줄 (버튼 아래) */
+  document.getElementById("jsonNote").textContent = msg || "";
+}
+function sizeText(bytes){ return bytes >= 1048576 ? (bytes / 1048576).toFixed(1) + "MB" : Math.max(1, Math.round(bytes / 1024)) + "KB"; }
+
+/* ---- 6단계 음성을 JSON에 담기 (V8.5) ----
+   음성 파일을 글자(data: 주소)로 바꿔 JSON의 media.aud 에 넣는다: { "쪽": [{ name, dur, data }, …] }
+   5단계 그림은 넣지 않는다(브라우저에만 보관). */
+function audForJson(){
+  var pages = {}, jobs = [], count = 0;
+  Object.keys(media.aud).forEach(function(n){
+    var clips = audClips(n);
+    if(!clips.length) return;
+    pages[n] = new Array(clips.length);
+    clips.forEach(function(c, i){
+      count++;
+      jobs.push(audioDataURL(c).then(function(url){
+        pages[n][i] = { name: c.name, dur: isFinite(c.dur) ? c.dur : null, data: url };
+      }, function(){ throw new Error("음성을 읽지 못했습니다: " + c.name); }));
+    });
+  });
+  return Promise.all(jobs).then(function(){ return { pages: pages, count: count }; });
+}
+function audInJson(data){   /* 파일에 든 음성 → { pages: { 쪽: [{ name, dur, data }] }, count } (없으면 count 0) */
+  var src = data && data.media && data.media.aud, pages = {}, count = 0;
+  if(src && typeof src === "object"){
+    Object.keys(src).forEach(function(n){
+      if(!/^\d{1,3}$/.test(n) || parseInt(n, 10) < 1 || !Array.isArray(src[n])) return;
+      var list = src[n].filter(function(c){ return c && typeof c.data === "string" && /^data:/.test(c.data); });
+      if(list.length){ pages[parseInt(n, 10)] = list; count += list.length; }
+    });
+  }
+  return { pages: pages, count: count };
+}
+function dataURLToBlob(url){
+  var m = /^data:([^,]*?)(;base64)?,/.exec(url);
+  if(!m) throw new Error("음성 데이터 형식 오류");
+  var body = url.slice(m[0].length);
+  if(!m[2]) return new Blob([decodeURIComponent(body)], { type: m[1] || "audio/mpeg" });
+  var bin = atob(body), len = bin.length, u8 = new Uint8Array(len);
+  for(var i = 0; i < len; i++) u8[i] = bin.charCodeAt(i);
+  return new Blob([u8], { type: m[1] || "audio/mpeg" });
+}
+function clipFromJson(c){   /* 파일 속 음성 하나 → 6단계에서 쓰는 모양 { blob, name, url, dur } */
+  return new Promise(function(resolve){ resolve(dataURLToBlob(c.data)); }).then(function(blob){
+    var url = URL.createObjectURL(blob), name = String(c.name || "음성");
+    return probeAudio(url).then(function(dur){
+      return { blob: blob, name: name, url: url, dur: isFinite(dur) ? dur : (typeof c.dur === "number" ? c.dur : NaN) };
+    }, function(err){ URL.revokeObjectURL(url); throw err; });
+  });
+}
+/* 이 브라우저의 6단계 음성을 파일에 든 음성으로 통째로 바꾼다 → { ok: 되살린 개수, failed: 못 연 개수 } */
+function restoreAud(pages){
+  var res = { ok: 0, failed: 0 }, made = {}, jobs = [];
+  Object.keys(pages).forEach(function(n){
+    made[n] = new Array(pages[n].length);
+    pages[n].forEach(function(c, i){
+      jobs.push(clipFromJson(c).then(function(clip){ made[n][i] = clip; res.ok++; }, function(){ res.failed++; }));
+    });
+  });
+  return Promise.all(jobs).then(function(){
+    var writes = [];
+    Object.keys(media.aud).forEach(function(n){ if(!made[n]) writes.push(setAudClips(parseInt(n, 10), [])); });
+    Object.keys(made).forEach(function(n){ writes.push(setAudClips(parseInt(n, 10), made[n].filter(Boolean))); });
+    return Promise.all(writes);
+  }).then(function(){ statNote.aud = ""; return res; });
+}
+
+var jsonBusy = false;
+function setJsonBusy(on){
+  jsonBusy = on;
+  [["btnJsonSave", "작업 내용 JSON으로 저장"], ["leaveDlgSave", "작업 내용 JSON으로 저장"]].forEach(function(x){
+    var b = document.getElementById(x[0]);
+    b.disabled = on; b.textContent = on ? "저장하는 중…" : x[1];
+  });
+  document.getElementById("btnJsonLoad").disabled = on;
+}
+/* 받은 파일 { name, size, aud(담긴 음성 개수) }을 Promise로 돌려준다. 음성을 글자로 바꾸느라 잠깐 걸릴 수 있다 */
+function saveJsonFile(){
+  clearJsonError(); setJsonNote("");
+  if(jsonBusy) return Promise.reject(new Error("지금 저장하는 중입니다. 잠시만 기다려 주세요."));
+  setJsonBusy(true);
   var data = { app: "storybook-prompt-generator", version: APP_VERSION, savedAt: new Date().toISOString(), step: state.step, fields: {} };
   fieldIds.forEach(function(id){ data.fields[id] = document.getElementById(id).value; });  /* apiKey 제외 */
-  var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  var title = (document.getElementById("s1concept").value.trim() || "동화책_프롬프트").replace(/[\\/:*?"<>|]/g, "").slice(0, 30);
-  a.download = title + "_" + stamp() + ".json";
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(a.href);
-  state.jsonSig = fieldsSig();   /* 지금 내용은 파일로 받았다고 기억 → 창을 닫을 때 다시 묻지 않는다 */
-  saveState();
-  return a.download;
+  var sig = workSig();   /* 저장을 시작한 때의 내용 */
+  return audForJson().then(function(aud){
+    data.media = { aud: aud.pages };
+    var text;
+    try{ text = JSON.stringify(data, null, 2); }
+    catch(e){ throw new Error("음성이 너무 커서 JSON 파일을 만들지 못했습니다. 6단계에서 음성 수나 길이를 줄인 뒤 다시 저장해 주세요."); }
+    var blob = new Blob([text], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    var title = (document.getElementById("s1concept").value.trim() || "동화책_프롬프트").replace(/[\\/:*?"<>|]/g, "").slice(0, 30);
+    a.download = title + "_" + stamp() + ".json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 10000);   /* 음성이 들어가 파일이 커졌으므로 받기가 시작된 뒤에 정리 */
+    state.jsonSig = sig;   /* 지금 내용은 파일로 받았다고 기억 → 창을 닫을 때 다시 묻지 않는다 */
+    saveState();
+    return { name: a.download, size: blob.size, aud: aud.count };
+  }).then(function(info){ setJsonBusy(false); return info; }, function(e){ setJsonBusy(false); throw e; });
 }
-document.getElementById("btnJsonSave").addEventListener("click", function(){ saveJsonFile(); });
+function savedNote(info){   /* 저장 결과 한 줄: 파일 이름 · 크기 · 무엇이 들어갔는지 */
+  var nImg = Object.keys(media.img).length;
+  return "저장했습니다: " + info.name + " (" + sizeText(info.size) +
+    (info.aud ? " · 6단계 음성 " + info.aud + "개 포함" : "") + ")" +
+    (nImg ? " · 5단계 그림 " + nImg + "개는 들어가지 않았습니다" : "");
+}
+document.getElementById("btnJsonSave").addEventListener("click", function(){
+  saveJsonFile().then(function(info){ setJsonNote(savedNote(info)); }, function(e){ showJsonError(e.message); });
+});
 document.getElementById("btnJsonLoad").addEventListener("click", function(){
   clearJsonError();
   document.getElementById("jsonFile").value = "";
@@ -1588,57 +1686,86 @@ document.getElementById("btnJsonLoad").addEventListener("click", function(){
 document.getElementById("jsonFile").addEventListener("change", function(){
   var file = this.files && this.files[0];
   if(!file) return;
-  var hasContent = fieldIds.some(function(id){ return document.getElementById(id).value.trim(); });
-  if(hasContent && !confirm("현재 작업 내용이 불러온 파일 내용으로 바뀝니다. 계속할까요?")){ return; }
+  clearJsonError(); setJsonNote("");
   var reader = new FileReader();
   reader.onload = function(){
+    var data, fields, count = 0, fileAud;
     try{
-      var data = JSON.parse(reader.result);
-      var fields = (data && data.fields) ? data.fields : data;   /* 구형 형식(평면 객체)도 허용 */
+      data = JSON.parse(reader.result);
+      fields = (data && data.fields) ? data.fields : data;   /* 구형 형식(평면 객체)도 허용 */
       if(!fields || typeof fields !== "object") throw new Error("형식 오류");
-      var count = 0;
-      fieldIds.forEach(function(id){
-        if(fields[id] !== undefined && fields[id] !== null){ document.getElementById(id).value = String(fields[id]); count++; }
-      });
+      fieldIds.forEach(function(id){ if(fields[id] !== undefined && fields[id] !== null) count++; });
       if(!count) throw new Error("이 앱의 작업 파일이 아닙니다.");
-      if(count === fieldIds.length) state.jsonSig = fieldsSig();   /* 화면이 파일과 같으니 "저장됨"으로 */
+      fileAud = audInJson(data);
+    }catch(e){
+      showJsonError("JSON 파일을 읽지 못했습니다. 이 앱에서 저장한 파일인지 확인해 주세요.\n(원문: " + e.message + ")");
+      return;
+    }
+    /* 파일을 다 읽은 뒤에 묻는다 — 읽지 못하는 파일이면 지금 내용을 건드리지 않는다 */
+    var hasContent = fieldIds.some(function(id){ return document.getElementById(id).value.trim(); });
+    var nowAud = audCount(), swapAud = fileAud.count && nowAud;
+    if((hasContent || swapAud) && !confirm("현재 작업 내용이 불러온 파일 내용으로 바뀝니다." +
+       (swapAud ? "\n6단계에 올려 둔 음성 " + nowAud + "개도 파일에 든 음성 " + fileAud.count + "개로 바뀝니다." : "") + " 계속할까요?")) return;
+    fieldIds.forEach(function(id){
+      if(fields[id] !== undefined && fields[id] !== null) document.getElementById(id).value = String(fields[id]);
+    });
+    /* 파일에 음성이 있으면 6단계 음성을 그것으로 바꾸고, 없으면(예전 파일 등) 이 브라우저의 음성을 그대로 둔다 */
+    (fileAud.count ? restoreAud(fileAud.pages) : Promise.resolve(null)).then(function(res){
+      if(count === fieldIds.length && !(res && res.failed)){
+        state.jsonSig = fileAud.count ? workSig() : fieldsSig();   /* 화면이 파일과 같으니 "저장됨"으로 */
+      }
       saveState();
       renderCards2(); renderCards3(); renderCards4();
+      renderGrid5(); renderGrid6();
       bookDirty = true;
       var s = parseInt(data.step, 10);
       showStep(s >= 1 && s <= LAST_STEP ? s : 1);
-      alert("불러오기 완료: " + file.name + (data.savedAt ? "\n저장 시각: " + new Date(data.savedAt).toLocaleString("ko-KR") : ""));
-    }catch(e){
-      showJsonError("JSON 파일을 읽지 못했습니다. 이 앱에서 저장한 파일인지 확인해 주세요.\n(원문: " + e.message + ")");
-    }
+      var audMsg = !res ? "" : "\n6단계 음성 " + res.ok + "개도 함께 불러왔습니다." + (res.failed ? " (" + res.failed + "개는 열지 못했습니다)" : "");
+      setJsonNote("불러왔습니다: " + file.name + (res ? " · 6단계 음성 " + res.ok + "개 포함" : ""));
+      alert("불러오기 완료: " + file.name + (data.savedAt ? "\n저장 시각: " + new Date(data.savedAt).toLocaleString("ko-KR") : "") + audMsg);
+    }).catch(function(e){
+      showJsonError("불러오는 중 오류가 발생했습니다.\n(원문: " + (e && e.message ? e.message : e) + ")");
+    });
   };
   reader.onerror = function(){ showJsonError("파일을 읽는 중 오류가 발생했습니다."); };
   reader.readAsText(file, "utf-8");
 });
 
 /* ---------- 창을 닫기 전에: JSON 저장 안내 (V8.4) ----------
-   1~4단계 내용이 마지막으로 JSON을 받거나 불러온 때와 다르면, 창을 닫거나 새로고침할 때 브라우저의
+   1~4단계 내용이나 6단계 음성이 마지막으로 JSON을 받거나 불러온 때와 다르면, 창을 닫거나 새로고침할 때 브라우저의
    "나가시겠습니까?" 확인창이 뜬다. 그 창의 문구는 브라우저가 정하므로(바꿀 수 없음),
    [취소]를 눌러 머무르면 바로 아래의 저장 안내 창을 띄워 JSON 저장 버튼을 내민다. */
 var skipLeaveWarn = false;   /* 전체 초기화처럼 스스로 새로 읽을 때는 묻지 않는다 */
-function fieldsSig(){        /* 1~4단계 입력·결과 전체의 지문 (길이:해시) */
-  var s = fieldIds.map(function(id){ var el = document.getElementById(id); return el ? el.value : ""; }).join("\u0001");
+function hashStr(s){         /* 글자 → 지문 (길이:해시) */
   var h = 5381;
   for(var i = 0; i < s.length; i++){ h = ((h << 5) + h + s.charCodeAt(i)) | 0; }
   return s.length + ":" + h;
 }
-function needsJsonSave(){
-  var hasWork = fieldIds.some(function(id){ return document.getElementById(id).value.trim(); });
-  return hasWork && state.jsonSig !== fieldsSig();
+function fieldsSig(){        /* 1~4단계 입력·결과 전체의 지문 */
+  return hashStr(fieldIds.map(function(id){ var el = document.getElementById(id); return el ? el.value : ""; }).join("\u0001"));
 }
-function setLeaveDlg(savedName){
-  var done = !!savedName;
+function audSig(){           /* 6단계 음성의 지문: 쪽 · 순서 · 파일 이름 · 크기 */
+  return hashStr(Object.keys(media.aud).map(Number).sort(function(a, b){ return a - b; }).map(function(n){
+    return n + ":" + audClips(n).map(function(c){ return c.name + "/" + (c.blob ? c.blob.size : 0); }).join(",");
+  }).join(";"));
+}
+function workSig(){          /* JSON에 들어가는 것 전체(1~4단계 + 6단계 음성)의 지문. 음성이 없으면 V8.4 때와 같은 값 */
+  return fieldsSig() + (audCount() ? "|a" + audSig() : "");
+}
+function needsJsonSave(){
+  var hasFields = fieldIds.some(function(id){ return document.getElementById(id).value.trim(); });
+  /* 올려 둔 음성을 아직 다 읽어 오기 전(창을 연 직후)에는 1~4단계만 견준다 */
+  if(!mediaReady) return hasFields && String(state.jsonSig || "").split("|a")[0] !== fieldsSig();
+  return (hasFields || audCount() > 0) && state.jsonSig !== workSig();
+}
+function setLeaveDlg(info){   /* info: 방금 받은 파일 { name, size, aud } — 없으면 "저장하셨나요?" 화면 */
+  var done = !!info;
   document.getElementById("leaveDlgTitle").textContent = done ? "저장했습니다" : "잠깐! 작업 내용을 파일로 저장하셨나요?";
   document.getElementById("leaveDlgMsg").textContent = done
-    ? "받은 파일: " + savedName
+    ? "받은 파일: " + info.name + " (" + sizeText(info.size) + ")"
     : "아직 JSON 파일로 저장하지 않은 작업이 있습니다. 창을 닫기 전에 파일로 저장해 두세요.";
   document.getElementById("leaveDlgSub").textContent = done
-    ? "다운로드 폴더에서 파일을 확인한 뒤 창을 닫으세요. (5·6단계에 올린 그림과 음성은 JSON에 들어가지 않습니다)"
+    ? "다운로드 폴더에서 파일을 확인한 뒤 창을 닫으세요. (" + (info.aud ? "6단계 음성 " + info.aud + "개도 함께 들어 있습니다 · " : "") + "5단계에 올린 그림은 JSON에 들어가지 않습니다)"
     : "이 브라우저에는 자동으로 보관되지만, 다른 컴퓨터나 브라우저에서는 이어서 할 수 없고 브라우저의 사이트 데이터를 지우면 사라집니다.";
   document.getElementById("leaveDlgSave").hidden = done;
   document.getElementById("leaveDlgClose").textContent = done ? "확인" : "나중에 하기";
@@ -1646,14 +1773,16 @@ function setLeaveDlg(savedName){
 function openLeaveDlg(){
   var dlg = document.getElementById("leaveDlg");
   if(typeof dlg.showModal !== "function"){   /* 아주 오래된 브라우저 */
-    if(confirm("아직 JSON 파일로 저장하지 않은 작업이 있습니다.\n지금 JSON 파일로 저장할까요?")) saveJsonFile();
+    if(confirm("아직 JSON 파일로 저장하지 않은 작업이 있습니다.\n지금 JSON 파일로 저장할까요?")) saveJsonFile().catch(function(e){ showJsonError(e.message); });
     return;
   }
   if(dlg.open) return;
-  setLeaveDlg("");
+  setLeaveDlg(null);
   dlg.showModal();
 }
-document.getElementById("leaveDlgSave").addEventListener("click", function(){ setLeaveDlg(saveJsonFile()); });
+document.getElementById("leaveDlgSave").addEventListener("click", function(){
+  saveJsonFile().then(setLeaveDlg, function(e){ document.getElementById("leaveDlgMsg").textContent = e.message; });
+});
 document.getElementById("leaveDlgClose").addEventListener("click", function(){ document.getElementById("leaveDlg").close(); });
 window.addEventListener("beforeunload", function(e){
   if(skipLeaveWarn || !needsJsonSave()) return;
@@ -1677,10 +1806,11 @@ document.addEventListener("keydown", function(e){
   if(e.key === "ArrowRight" && state.step < LAST_STEP) showStep(state.step + 1);
 });
 
-/* ---------- 5·6단계: 쪽별 그림·음성 (브라우저 IndexedDB에만 보관) ---------- */
+/* ---------- 5·6단계: 쪽별 그림·음성 (브라우저 IndexedDB에 보관. V8.5부터 음성은 JSON 저장에도 담긴다) ---------- */
 var DB_NAME = "storybookAudioFlipbook_v8", DB_STORE = "media";
 var media = { img: {}, aud: {} };   /* 쪽 번호 → 그림 { blob, name, url, w, h, fx, fy } / 음성 { clips: [{ blob, name, url, dur }, …] } (V8.3부터 한 쪽에 여러 개) */
 var mediaSaved = true;              /* IndexedDB를 못 쓰면 false → 새로고침하면 사라짐 */
+var mediaReady = false;             /* 창을 열고 IndexedDB에서 그림·음성을 다 읽어 왔는지 (initMedia가 끝나면 true) */
 var dbPromise = null;
 var bookDirty = true;               /* 7단계 책을 다시 만들어야 하는지 */
 
@@ -2596,6 +2726,7 @@ function initMedia(){
       media[m[1]][parseInt(m[2], 10)] = rec;
     });
   }).catch(function(){ mediaSaved = false; }).then(function(){
+    mediaReady = true;
     bookDirty = true;
     renderGrid5(); renderGrid6();
     if(state.step === 7) ensureBook();
