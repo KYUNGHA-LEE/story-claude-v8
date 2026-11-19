@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>동화책 프롬프트 생성기 V8.6 · 오디오 플립북</title>
+<title>동화책 프롬프트 생성기 V8.7 · 오디오 플립북</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTQiIGZpbGw9IiMwRTdDNzQiLz48IS0tIO2OvOy5nCDssYUgLS0+PHBhdGggZD0iTTEyIDIwIFEyMiAxNiAzMiAyMiBMMzIgNTAgUTIyIDQ0IDEyIDQ4IFoiIGZpbGw9IiNGQkY2RUMiLz48cGF0aCBkPSJNNTIgMjAgUTQyIDE2IDMyIDIyIEwzMiA1MCBRNDIgNDQgNTIgNDggWiIgZmlsbD0iI0ZERUJEQyIvPjxwYXRoIGQ9Ik0zMiAyMiBMMzIgNTAiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIi8+PCEtLSDquIDspIQgLS0+PHBhdGggZD0iTTE3IDI4IEwyNyAyNiBNMTcgMzQgTDI3IDMyIE0xNyA0MCBMMjcgMzgiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii42Ii8+PCEtLSDrp4jrspUg67OEIC0tPjxwYXRoIGQ9Ik00MiAyNiBsMi4yIDQuNCA0LjguNy0zLjUgMy40LjggNC44LTQuMy0yLjMtNC4zIDIuMy44LTQuOC0zLjUtMy40IDQuOC0uN3oiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSI0OCIgY3k9IjE0IiByPSIyLjIiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSIxNCIgY3k9IjE0IiByPSIxLjYiIGZpbGw9IiNGREVCREMiLz48L3N2Zz4=">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -256,6 +256,23 @@
   }
   .ccard .copybtn:hover{background:var(--teal-soft);}
   .ccard .copybtn.copied{background:var(--teal);color:#fff;border-color:var(--teal);}
+  /* 카드 안에서 바로 고치기 (V8.7) */
+  .ccard .copybtn + .copybtn{margin-left:6px;}
+  .ccard .editbtn{border-color:#8A857A;color:var(--ink);}
+  .ccard .editbtn:hover{background:#F3EFE6;}
+  .ccard.editing > .copybtn{display:none;}      /* 고치는 동안에는 복사·수정 버튼을 숨긴다(옛 글이 복사되지 않게) */
+  .ccard .cedit{border-top:1px dashed var(--line);padding-top:10px;}
+  .ccard .cedit textarea{
+    display:block;width:100%;box-sizing:border-box;min-height:110px;
+    font-family:inherit;font-size:0.9rem;line-height:1.75;color:var(--ink);
+    padding:10px 12px;border:2px solid var(--teal);border-radius:8px;background:#fff;resize:vertical;
+  }
+  .ccard .cedithint{font-size:0.76rem;color:var(--muted);margin-top:6px;}
+  .ccard .ceditmsg{font-size:0.8rem;font-weight:700;color:var(--danger);margin-top:6px;}
+  .ccard .ceditmsg:empty{display:none;}
+  .ccard .cedit .copybtn.save{background:var(--teal);color:#fff;}
+  .ccard .cedit .copybtn.save:hover{filter:brightness(0.95);background:var(--teal);}
+  .ccard.justsaved{box-shadow:0 0 0 3px var(--teal-soft), 0 0 0 5px var(--teal);}
   .tbadge{
     display:inline-block;font-size:0.68rem;font-weight:700;border-radius:5px;
     padding:1px 7px;color:#fff;vertical-align:1px;
@@ -388,7 +405,7 @@
   <header class="app-head">
     <div class="headtop">
       <div class="headtitle">
-        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8.6 · 오디오 플립북</span></h1>
+        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8.7 · 오디오 플립북</span></h1>
       </div>
       <div class="credit">
         made by <b>이경하</b>
@@ -483,7 +500,7 @@
     <div class="error" id="err3"></div>
     <div class="resulthead">페이지별 원고 카드</div>
     <div class="cards" id="cards3"></div>
-    <div class="resulthint">아래 원본 표를 직접 고치면 카드도 함께 바뀌고, 다음 단계에도 고친 내용이 사용됩니다.</div>
+    <div class="resulthint">카드의 [원고 수정]으로 그 쪽 글을 바로 고칠 수 있고, [원고 복사]는 그 쪽 글만 복사합니다. 아래 원본 표를 직접 고쳐도 카드가 함께 바뀌며, 고친 내용은 다음 단계에도 사용됩니다.</div>
     <textarea class="result" id="s3result" placeholder="[원고 생성] 버튼을 누르면 여기에 결과 표가 채워집니다."></textarea>
     <div class="nav">
       <button class="btn ghost" data-go="1" type="button">이전 단계</button>
@@ -562,7 +579,7 @@
       <span class="chip missing">이름을 못 찾음</span>
     </div>
     <div class="cards" id="cards4"></div>
-    <div class="resulthint">아래 원본 표를 직접 고치면 카드도 함께 바뀝니다. 카드의 복사 버튼을 누르면 장면 프롬프트 + 첨부할 참조 이미지 안내 + 화풍·크기 태그가 함께 복사됩니다. (열 순서: 페이지 | 사용 에셋 | 장면 프롬프트 · 추가 에셋이 있으면 그 아래에 [추가 에셋] 표가 이어집니다: 종류 | 에셋 이름 | 설명 | 참조 이미지 프롬프트)</div>
+    <div class="resulthint">카드의 [장면 수정]으로 그 쪽 장면 프롬프트를 바로 고칠 수 있습니다. 아래 원본 표를 직접 고쳐도 카드가 함께 바뀝니다. 카드의 복사 버튼을 누르면 장면 프롬프트 + 첨부할 참조 이미지 안내 + 화풍·크기 태그가 함께 복사됩니다. (열 순서: 페이지 | 사용 에셋 | 장면 프롬프트 · 추가 에셋이 있으면 그 아래에 [추가 에셋] 표가 이어집니다: 종류 | 에셋 이름 | 설명 | 참조 이미지 프롬프트)</div>
     <textarea class="result" id="s4result" placeholder="[장면 생성] 버튼을 누르면 여기에 결과 표가 채워집니다."></textarea>
     <div class="nav">
       <button class="btn ghost" data-go="3" type="button">이전 단계</button>
@@ -693,7 +710,7 @@
 /* ---------- 상태 저장 ---------- */
 var LS_KEY = "storybookAssetPromptApp_v1";          /* V7부터 별도 저장 공간 (예전 앱과 섞이지 않게) */
 var LS_API_KEY = "storybookPromptApp_apiKey";        /* API 키는 예전 앱과 공유 (사용자 동의 시에만 저장) */
-var APP_VERSION = "V8.6 오디오 플립북 · Claude 수정 2026.11.19";
+var APP_VERSION = "V8.7 오디오 플립북 · Claude 수정 2026.11.19";
 var LAST_STEP = 7;
 /* 단계 번호 → 패널·결과칸. V8.1에서 2단계(원고)·3단계(에셋) 순서를 바꿨지만,
    입력칸 id(s2*=에셋, s3*=원고)는 저장 파일 호환을 위해 그대로 둔다 */
@@ -970,7 +987,7 @@ function stripMd(s){
 function parseTableRows(text){
   var rows = [];
   var lines = text.split(/\r?\n/);
-  lines.forEach(function(line){
+  lines.forEach(function(line, idx){
     var t = line.trim();
     if(!t) return;
     var cells = null;
@@ -986,9 +1003,38 @@ function parseTableRows(text){
     } else {
       return;
     }
-    rows.push(cells.map(stripMd));
+    var row = cells.map(stripMd);
+    row.line = idx;   /* 원문의 몇 번째 줄인지 — 카드에서 고친 내용을 원본 표의 그 줄에 되쓸 때 쓴다 (V8.7) */
+    rows.push(row);
   });
   return rows;
+}
+/* 표 한 줄 → { cells: [원문 그대로의 칸, …], tab: 탭으로 나뉜 줄인지 }. 표 줄이 아니면 null */
+function splitTableLine(line){
+  var t = String(line || "").trim(), cells;
+  if(t.indexOf("|") !== -1){
+    cells = t.split("|").map(function(c){ return c.trim(); });
+    if(cells.length && cells[0] === "") cells.shift();
+    if(cells.length && cells[cells.length-1] === "") cells.pop();
+    return cells.length ? { cells: cells, tab: false } : null;
+  }
+  if(t.indexOf("\t") !== -1) return { cells: t.split("\t").map(function(c){ return c.trim(); }), tab: true };
+  return null;
+}
+/* 카드에서 고친 글을 원본 표(결과칸)의 그 줄 마지막 칸에 되쓴다 (V8.7).
+   resultId = 결과칸 id, lineIdx = 그 줄의 번호, page = 그 줄의 첫 칸(쪽) — 줄이 바뀌었는지 확인용, keep = 앞에서 그대로 둘 칸 수.
+   표 칸에는 줄바꿈과 | 를 쓸 수 없어서 줄바꿈은 띄어쓰기로, | 는 / 로 바꾼다. 성공하면 true */
+function writeBackCell(resultId, lineIdx, page, keep, text){
+  var el = document.getElementById(resultId);
+  var lines = el.value.split(/\r?\n/);
+  var parsed = (lineIdx >= 0 && lineIdx < lines.length) ? splitTableLine(lines[lineIdx]) : null;
+  if(!parsed || parsed.cells.length <= keep || stripMd(parsed.cells[0]) !== page) return false;
+  var clean = String(text).replace(/\s*\r?\n\s*/g, " ").replace(/\|/g, "/").trim();
+  if(!clean) return false;
+  var cells = parsed.cells.slice(0, keep).concat([clean]);
+  lines[lineIdx] = parsed.tab ? cells.join("\t") : "| " + cells.join(" | ") + " |";
+  el.value = lines.join("\n");
+  return true;
 }
 function looksLikeHeader(cells){
   var joined = cells.join(" ");
@@ -1219,8 +1265,66 @@ function renderCards3(){
     var p = document.createElement("div"); p.className = "cprompt";
     renderHighlighted(p, body, list.filter(function(a){ return a.type === "char"; }));
     card.appendChild(n); card.appendChild(p);
+    card.setAttribute("data-line", cells.line);
+    card.appendChild(makeCopyBtn(function(){ return body; }, "원고 복사"));   /* 그 쪽 원고 글만 (쪽 번호 없이) */
+    card.appendChild(makeEditBtn("원고 수정", function(){
+      openCardEdit({ card: card, bodyEl: p, text: body, label: "원고", boxId: "cards3", resultId: "s3result", line: cells.line, page: page, keep: 1 });
+    }));
     box.appendChild(card);
   });
+}
+function makeEditBtn(label, onClick){
+  var b = document.createElement("button");
+  b.type = "button"; b.className = "copybtn editbtn"; b.textContent = label;
+  b.addEventListener("click", onClick);
+  return b;
+}
+/* 카드 안에서 바로 고치기 (V8.7): 본문 자리에 입력칸을 열고, [수정 저장]을 누르면 원본 표(결과칸)의 그 줄에 되쓴다.
+   o = { card, bodyEl(본문 칸), text(지금 글), label, boxId(카드 묶음 id), resultId(결과칸 id), line(원본 표의 줄 번호), page(쪽), keep(앞에서 그대로 둘 칸 수) } */
+function openCardEdit(o){
+  var card = o.card;
+  if(card.classList.contains("editing")) return;
+  card.classList.add("editing");
+  o.bodyEl.hidden = true;
+  var box = document.createElement("div"); box.className = "cedit";
+  var ta = document.createElement("textarea");
+  ta.value = o.text; ta.setAttribute("aria-label", o.label + " 수정");
+  var hint = document.createElement("div"); hint.className = "cedithint";
+  hint.textContent = "저장하면 아래 원본 표에도 반영됩니다. (Ctrl+Enter 저장 · Esc 취소)";
+  var msg = document.createElement("div"); msg.className = "ceditmsg"; msg.setAttribute("role", "alert");
+  var row = document.createElement("div"); row.className = "ceditrow";
+  var ok = document.createElement("button"); ok.type = "button"; ok.className = "copybtn save"; ok.textContent = "수정 저장";
+  var no = document.createElement("button"); no.type = "button"; no.className = "copybtn"; no.textContent = "취소";
+  function close(){
+    if(box.parentNode) box.parentNode.removeChild(box);
+    o.bodyEl.hidden = false;
+    card.classList.remove("editing");
+  }
+  function save(){
+    var v = ta.value.trim();
+    if(!v){ msg.textContent = "내용이 비어 있습니다. 이 쪽을 아예 지우려면 아래 원본 표에서 그 줄을 지워 주세요."; return; }
+    if(v === o.text){ close(); return; }
+    if(!writeBackCell(o.resultId, o.line, o.page, o.keep, v)){
+      msg.textContent = "원본 표에서 이 쪽을 찾지 못해 저장하지 못했습니다. 아래 원본 표에서 직접 고쳐 주세요.";
+      return;
+    }
+    /* 결과칸을 직접 고쳤을 때와 같은 길로: 자동 보관 + 카드 다시 그리기 */
+    document.getElementById(o.resultId).dispatchEvent(new Event("input", { bubbles: true }));
+    var again = document.querySelector("#" + o.boxId + ' .ccard[data-line="' + o.line + '"]');
+    if(again){ again.classList.add("justsaved"); setTimeout(function(){ again.classList.remove("justsaved"); }, 1600); }
+  }
+  ok.addEventListener("click", save);
+  no.addEventListener("click", close);
+  ta.addEventListener("keydown", function(e){
+    if(e.isComposing) return;   /* 한글 조합 중의 Enter·Esc 는 무시 */
+    if(e.key === "Enter" && (e.ctrlKey || e.metaKey)){ e.preventDefault(); save(); }
+    else if(e.key === "Escape"){ e.preventDefault(); close(); }
+  });
+  row.appendChild(ok); row.appendChild(no);
+  box.appendChild(ta); box.appendChild(hint); box.appendChild(msg); box.appendChild(row);
+  o.bodyEl.parentNode.insertBefore(box, o.bodyEl.nextSibling);
+  ta.style.height = Math.min(420, Math.max(110, ta.scrollHeight + 6)) + "px";
+  ta.focus();
 }
 /* 책 한 쪽 크기 → "가로 210mm × 세로 210mm (비율 1:1, 정사각형)". 비율은 이미지 생성기가 실제로 보는 값이라 함께 적는다 */
 function sizeText(){
@@ -1295,7 +1399,7 @@ function renderCards4(){
       var no = pageNo(page);
       if(arr.indexOf(no) === -1) arr.push(no);
     });
-    pageData.push({ page: page, scene: scene, used: used });
+    pageData.push({ page: page, scene: scene, used: used, line: cells.line, keep: cells.length >= 3 ? 2 : 1 });
   });
   renderExtra4(parts.extra, usedIn);
   pageData.forEach(function(d){
@@ -1345,7 +1449,11 @@ function renderCards4(){
     if(ref){ var rl = document.createElement("div"); rl.className = "refline"; rl.textContent = ref; card.appendChild(rl); }
     var t = document.createElement("div"); t.className = "finaltag"; t.textContent = tag;
     card.appendChild(t);
+    card.setAttribute("data-line", d.line);
     card.appendChild(makeCopyBtn(function(){ return full; }, "최종 프롬프트 복사"));
+    card.appendChild(makeEditBtn("장면 수정", function(){
+      openCardEdit({ card: card, bodyEl: p, text: scene, label: "장면 프롬프트", boxId: "cards4", resultId: "s4result", line: d.line, page: page, keep: d.keep });
+    }));
     box.appendChild(card);
   });
 }
