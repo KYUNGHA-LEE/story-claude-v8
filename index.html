@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>동화책 프롬프트 생성기 V8.9 · 오디오 플립북</title>
+<title>동화책 프롬프트 생성기 V8.10 · 오디오 플립북</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTQiIGZpbGw9IiMwRTdDNzQiLz48IS0tIO2OvOy5nCDssYUgLS0+PHBhdGggZD0iTTEyIDIwIFEyMiAxNiAzMiAyMiBMMzIgNTAgUTIyIDQ0IDEyIDQ4IFoiIGZpbGw9IiNGQkY2RUMiLz48cGF0aCBkPSJNNTIgMjAgUTQyIDE2IDMyIDIyIEwzMiA1MCBRNDIgNDQgNTIgNDggWiIgZmlsbD0iI0ZERUJEQyIvPjxwYXRoIGQ9Ik0zMiAyMiBMMzIgNTAiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIi8+PCEtLSDquIDspIQgLS0+PHBhdGggZD0iTTE3IDI4IEwyNyAyNiBNMTcgMzQgTDI3IDMyIE0xNyA0MCBMMjcgMzgiIHN0cm9rZT0iIzBBNUQ1NyIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIG9wYWNpdHk9Ii42Ii8+PCEtLSDrp4jrspUg67OEIC0tPjxwYXRoIGQ9Ik00MiAyNiBsMi4yIDQuNCA0LjguNy0zLjUgMy40LjggNC44LTQuMy0yLjMtNC4zIDIuMy44LTQuOC0zLjUtMy40IDQuOC0uN3oiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSI0OCIgY3k9IjE0IiByPSIyLjIiIGZpbGw9IiNFODYzMEEiLz48Y2lyY2xlIGN4PSIxNCIgY3k9IjE0IiByPSIxLjYiIGZpbGw9IiNGREVCREMiLz48L3N2Zz4=">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -411,7 +411,7 @@
   <header class="app-head">
     <div class="headtop">
       <div class="headtitle">
-        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8.9 · 오디오 플립북</span></h1>
+        <h1>동화책 프롬프트 생성기 <span style="font-size:0.9rem;color:var(--orange);">V8.10 · 오디오 플립북</span></h1>
       </div>
       <div class="credit">
         made by <b>이경하</b>
@@ -732,7 +732,7 @@
 /* ---------- 상태 저장 ---------- */
 var LS_KEY = "storybookAssetPromptApp_v1";          /* V7부터 별도 저장 공간 (예전 앱과 섞이지 않게) */
 var LS_API_KEY = "storybookPromptApp_apiKey";        /* API 키는 예전 앱과 공유 (사용자 동의 시에만 저장) */
-var APP_VERSION = "V8.9 오디오 플립북 · Claude 수정 2026.11.20";
+var APP_VERSION = "V8.10 오디오 플립북 · Claude 수정 2026.11.20";
 var LAST_STEP = 7;
 /* 단계 번호 → 패널·결과칸. V8.1에서 2단계(원고)·3단계(에셋) 순서를 바꿨지만,
    입력칸 id(s2*=에셋, s3*=원고)는 저장 파일 호환을 위해 그대로 둔다 */
@@ -2753,6 +2753,7 @@ function flipbookViewer(BOOK, root, opts){
   var pages = BOOK.pages, n = pages.length, ratio = BOOK.ratio || 1;
   pages.forEach(function(p){ p.auds = Array.isArray(p.aud) ? p.aud.filter(Boolean) : (p.aud ? [p.aud] : []); });   /* 한 쪽에 음성 여러 개 → 차례로 */
   var pf = null, unit = null, curIdx = 0, alive = true, unlocked = false;
+  var shiftEl = null, leaving = false;   /* 책을 좌우로 옮기는 틀 · 책장이 넘어가는 중인지 (V8.10) */
   var player = new Audio(), playerK = 0, playerI = 0, queue = [], qi = 0, timers = [];   /* playerK·playerI: 지금 소리 나는 쪽·몇 번째 음성 */
   var PRE = 450, GAP = 500, CLIP = 350, AUTO = 1500;   /* 넘긴 뒤 읽기까지 · 왼쪽→오른쪽 쪽 사이 · 같은 쪽 음성 사이 · 자동 넘김까지 (ms) */
 
@@ -2831,8 +2832,24 @@ function flipbookViewer(BOOK, root, opts){
     }
     playItem(queue[0], true);
   }
+  /* 표지·뒤표지 한 장만 보일 때는 그 장이 가운데에 오도록 책을 반 쪽만큼 옮긴다 (V8.10).
+     두 쪽을 펼치는 넓은 화면에서 표지는 오른쪽 칸, 뒤표지는 왼쪽 칸에 놓이기 때문이다. 책장을 넘기기 시작하면 펼친 자리로 돌아온다.
+     jump = 미끄러지는 움직임 없이 바로 (책을 새로 만들 때) */
+  function centerCover(jump){
+    if(!pf || !shiftEl) return;
+    var x = 0;
+    if(!portrait() && !leaving){
+      var cnt = pf.getPageCount();
+      if(curIdx <= 0) x = -25;
+      else if(cnt % 2 === 0 && curIdx >= cnt - 1) x = 25;
+    }
+    if(jump) shiftEl.style.transition = "none";
+    shiftEl.style.transform = x ? "translateX(" + x + "%)" : "";
+    if(jump){ void shiftEl.offsetWidth; shiftEl.style.transition = ""; }
+  }
   function onFlip(idx, quiet){
     curIdx = idx;
+    centerCover();
     var u = unitOf(idx);
     if(!unit || u.key !== unit.key){
       unit = u; stop(); queue = []; qi = 0;
@@ -2850,7 +2867,9 @@ function flipbookViewer(BOOK, root, opts){
     if(pf){ try{ pf.destroy(); }catch(e){} pf = null; }
     host.innerHTML = "";
     sizeHost();
-    var book = document.createElement("div"); host.appendChild(book);
+    shiftEl = document.createElement("div"); shiftEl.className = "fb-shift"; host.appendChild(shiftEl);
+    leaving = false;
+    var book = document.createElement("div"); shiftEl.appendChild(book);
     var cv = BOOK.cover && BOOK.cover.img ? BOOK.cover : null;   /* 표지 그림이 있으면 제목 글자 대신 그림 */
     var cover = mk("cover" + (cv ? " pic" + (picOnly ? " contain" : "") : ""), true);
     if(cv){
@@ -2895,12 +2914,18 @@ function flipbookViewer(BOOK, root, opts){
     });
     pf.loadFromHTML(book.querySelectorAll(".bpage"));
     var quietUntil = Date.now() + 400;   /* 다시 만들 때 쪽 위치를 되돌리는 것은 '넘김'으로 보지 않음 */
-    pf.on("flip", function(ev){ onFlip(ev.data, Date.now() < quietUntil); });
-    pf.on("changeOrientation", fitFont);
+    pf.on("flip", function(ev){ leaving = false; onFlip(ev.data, Date.now() < quietUntil); });
+    pf.on("changeState", function(ev){   /* 넘기기 시작(끌기·넘어가는 중)하면 펼친 자리로, 멈추면 다시 표지 자리로 */
+      if(ev.data === "user_fold" || ev.data === "flipping") leaving = true;
+      else if(ev.data === "read") leaving = false;
+      centerCover();
+    });
+    pf.on("changeOrientation", function(){ fitFont(); centerCover(true); });
     fitFont();
     unit = null;
     if(startIdx > 0){ try{ pf.turnToPage(startIdx); }catch(e){} }
     onFlip(pf.getCurrentPageIndex(), true);
+    centerCover(true);
   }
   /* 아이폰 등은 첫 재생이 버튼을 누른 순간에 일어나야 하므로, 처음 누를 때 소리 없이 한 번 재생해 둔다 */
   function unlock(){
@@ -2999,7 +3024,9 @@ function flipbookViewer(BOOK, root, opts){
 var VIEWER_CSS = [
   ".fb-stage{background:#3A332B;border-radius:12px;padding:22px 12px;display:flex;flex-direction:column;align-items:center;gap:14px;font-family:'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif;}",
   ".fb-stage:fullscreen{border-radius:0;justify-content:center;padding:20px;}",
+  ".fb-stage{overflow-x:hidden;overflow-x:clip;}",   /* 표지를 가운데로 옮길 때 빈 반쪽이 화면 밖으로 밀려 가로 스크롤이 생기지 않게 */
   ".fb-host{margin:0 auto;}",
+  ".fb-shift{transition:transform .6s ease;}",
   ".fb-stage .bpage{background:#FFFDF8;overflow:hidden;}",
   ".fb-stage .bpage .fill{position:absolute;inset:0;}",
   ".fb-stage .bpage img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;pointer-events:none;}",
